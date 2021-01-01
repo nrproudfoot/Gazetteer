@@ -54,10 +54,105 @@ function createOptions(){
 }
 })
 }
+function getInfo(code){
+    /* Get information about given country from getInfo.php */
+    code = code.trim();
+    $.ajax({
+		url: "getInfo.php",
+		type: 'GET',
+        dataType: 'json',
+        data: {
+            code: code,
+        },
+        success: function(result){
+            console.log("Success: Recieved API response from getInfo.php");
+            let country = result.data;
+            addModalInfo(country);
+            addMapLayers(country);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log("Failure: Error getting API response from getInfo.php");
+        }
+    });
+}
+function addModalInfo(country){
+    
+    // Format population string
+    let population;
+    if (country.population >= 1000000000){
+        population = Number.parseFloat(country.population / 1000000000).toFixed(1) + " billion";
+    } else {
+        population = Number.parseFloat(country.population / 1000000).toFixed(1) + " million";
+    };
+    // Format currency string
+    let currency = country.currencies[0].name + " (" + country.currencies[0].symbol + ")";
 
+    // Update modal html
+    $("#name").html(country.name);
+    $("#capital").html(country.capital);
+    $("#population").html(population);
+    $("#region").html(country.region);
+    $("#flag").attr("src",country.flag);
+    $("#currency").html(currency);
+}
+function addMapLayers(country){
+    // Create capital city marker
+    var capLatLng = new L.LatLng(country.weather.coord.lat,country.weather.coord.lon);
+    capitalMarker.setLatLng(capLatLng).addTo(map);
+    capitalMarker.bindTooltip("<p><strong>Capital City: </strong><br>" + country.capital + "</p>").openTooltip();
+    country = country.features;
+    // Add boundary border to map
+    // Reverse coordinates for creating bounds
+    let coords = [];
+    // Special case for countries with overseas territories or boundays that split the map
+    if (country.properties.iso_a2 == "US" || country.properties.iso_a2 == "FR" || country.properties.iso_a2 == "RU" || country.properties.iso_a2 == "FJ"){
+        let max = 0;
+        let biggestIsland;
+        country.geometry.coordinates.forEach(island => {
+            if (island[0].length > max){
+                max = island[0].length;
+                biggestIsland = island;
+            }
+        })
+        biggestIsland[0].forEach(coord => {
+            let point = [];
+            point[0] = coord[1];
+            point[1] = coord[0];
+            coords.push(point);
+        })
+    } else if (country.geometry.coordinates.length > 1){
+        country.geometry.coordinates.forEach(island => {
+            island[0].forEach(coord => {
+                let point = [];
+                point[0] = coord[1];
+                point[1] = coord[0];
+                coords.push(point);
+            }) 
+        })
+    } else {
+        country.geometry.coordinates[0].forEach(coord => {
+            let point = [];
+            point[0] = coord[1];
+            point[1] = coord[0];
+            coords.push(point);
+        })
+    }
+    let bounds = new L.LatLngBounds(coords);
+    map.fitBounds(bounds);
+    var currentCountry = country;
+    if (boundaryLayer)
+    {  
+        map.removeLayer(boundaryLayer);
+    }
+    boundaryLayer = L.geoJSON(currentCountry, {
+    style: {color: "#33CC33"}
+    }).addTo(map); 
+    document.getElementById('selectCountry').value=country.properties.iso_a2;
+}
 function updateMap(code){
+    getInfo(code);
     /* Requests country data from json object.
-    Takes a callback function as argument to process response */
+    Takes a callback function as argument to process response 
     code = code.trim();
     $.ajax({
 		url: "getInfo.php",
@@ -147,7 +242,7 @@ function updateMap(code){
 		error: function(jqXHR, textStatus, errorThrown) {
             console.log("Failure: Error getting country from getCountry.php");
 }
-})
+}) */
 }
 function getCountryCode(position){
     /* Call API to get country code from lat,lng */
