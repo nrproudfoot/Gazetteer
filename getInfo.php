@@ -1,6 +1,8 @@
 <?php
 	// API ids/keys/secrets
 	$openWeatherId = '4d38fe24ed24d11251cc0c8aead8b3cc';
+	$foursquareId = 'QISSDTUMJIE24U035OO4RLJKPUKCCZT3BJVXNYLJF0U2DQVR';
+	$foursquareSecret = 'ZJXFOYRVSOJABCIYEP4VU2BJJVNODPKAX5TIDNFGPOYRC1T2';
 
 	$executionStartTime = microtime(true) / 1000;
 
@@ -19,6 +21,14 @@
 	$result2 =curl_exec($ch);
 	$weather = json_decode($result2, true);
 
+	// Get list of sights
+	$url = 'https://api.foursquare.com/v2/venues/explore?near=' . $_REQUEST['code'] . '&section=sights&limit=50&sortByPopularity=1&client_id=' . $foursquareId . '&client_secret=' . $foursquareSecret . '&v=20210101';
+    curl_setopt($ch, CURLOPT_URL,$url);
+	$foursquareResult =curl_exec($ch);
+	$foursquare = json_decode($foursquareResult, true);
+	$foursquare = $foursquare['response']['groups'][0]['items'];
+
+
 	curl_close($ch);
 
 	// Get features information from json file
@@ -32,6 +42,21 @@
 	}
 	$feature = $result;
 
+	// Format foursquare
+	$foursquareVenues = array();
+	foreach ($foursquare as $venue){
+		$info = [
+			"id" => $venue['venue']['id'],
+			"name" => $venue['venue']['name'],
+			"lat" => $venue['venue']['location']['lat'],
+			"lng" => $venue['venue']['location']['lng'],
+			"address" => $venue['venue']['location']['formattedAddress'],
+			"category" => $venue['venue']['categories'][0]['name'],
+			"icon" => $venue['venue']['categories'][0]['icon']['prefix'] . "bg_32" . $venue['venue']['categories'][0]['icon']['suffix'],
+		];
+		array_push($foursquareVenues, $info);
+	};
+
 	// Format data object
     $countryInfo = [
         "name" => $country['name'],
@@ -43,7 +68,8 @@
         "flag" => $country['flag'],
         "capital" => $country['capital'],
         "weather" => $weather,
-        "features" => $feature,
+		"features" => $feature,
+		"foursquare" => $foursquareVenues,
 	];
 	
 
