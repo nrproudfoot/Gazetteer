@@ -5,6 +5,15 @@
 	$foursquareSecret = 'ZJXFOYRVSOJABCIYEP4VU2BJJVNODPKAX5TIDNFGPOYRC1T2';
 
 	$executionStartTime = microtime(true) / 1000;
+	// Get slug
+	$str = file_get_contents('countries.json');
+	$decode = json_decode($str,true);
+	$countries =$decode['countries'];
+	foreach ($countries as $features){
+		if ($features['ISO2'] === $_REQUEST['code']){
+			$slug = $features["Slug"];
+		}
+	}
 
 	// Get basic country information
 	$url='https://restcountries.eu/rest/v2/alpha/' . $_REQUEST['code'];
@@ -21,12 +30,26 @@
 	$result2 =curl_exec($ch);
 	$weather = json_decode($result2, true);
 
-	// Get list of sights
-	$url = 'https://api.foursquare.com/v2/venues/explore?near=' . $_REQUEST['code'] . '&section=sights&limit=50&sortByPopularity=1&client_id=' . $foursquareId . '&client_secret=' . $foursquareSecret . '&v=20210101';
-    curl_setopt($ch, CURLOPT_URL,$url);
+	$foursquareurl = 'https://api.foursquare.com/v2/venues/explore?near=' . $slug . '&categoryId=4bf58dd8d48988d165941735,52e81612bcbc57f1066b7a21,56aa371be4b08b9a8d573560,4deefb944765f83613cdba6e&limit=25&sortByPopularity=1&client_id=' . $foursquareId . '&client_secret=' . $foursquareSecret . '&v=20210101';
+    curl_setopt($ch, CURLOPT_URL,$foursquareurl);
 	$foursquareResult =curl_exec($ch);
 	$foursquare = json_decode($foursquareResult, true);
 	$foursquare = $foursquare['response']['groups'][0]['items'];
+
+	// Get covid stats
+	$url = "https://api.covid19api.com/total/country/" . $_REQUEST['code'];
+	curl_setopt($ch, CURLOPT_URL,$url);
+	$covidResult = curl_exec($ch);
+	$covid = json_decode($covidResult, true);
+	$index = array_key_last($covid);
+	$latestData = [
+		"confirmed" => $covid[$index]['Confirmed'],
+		"deaths" => $covid[$index]['Deaths'],
+		"weeklyconfirmed" => $covid[$index]['Confirmed'] - $covid[$index-7]['Confirmed'],
+		"weeklydeaths" => $covid[$index]['Deaths'] - $covid[$index-7]['Deaths'],
+		"dailyavg" => ($covid[$index]['Confirmed'] - $covid[$index-7]['Confirmed']) / 7,
+		"dailydeaths" => ($covid[$index]['Deaths'] - $covid[$index-7]['Deaths']) / 7,
+	];
 
 
 	curl_close($ch);
@@ -40,6 +63,7 @@
 			$result = $features;
 		}
 	}
+	
 	$feature = $result;
 
 	// Format foursquare
@@ -55,6 +79,7 @@
 			"icon" => $venue['venue']['categories'][0]['icon']['prefix'] . "bg_32" . $venue['venue']['categories'][0]['icon']['suffix'],
 		];
 		array_push($foursquareVenues, $info);
+		
 	};
 
 	// Format data object
@@ -70,6 +95,9 @@
         "weather" => $weather,
 		"features" => $feature,
 		"foursquare" => $foursquareVenues,
+		"covid" => $latestData,
+		"allInfo" => $foursquareResult,
+		"slug" => $slug,
 	];
 	
 

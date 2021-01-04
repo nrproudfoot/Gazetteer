@@ -3,7 +3,9 @@ var map = new L.Map("mapid", {
     container: 'map',
     style: 'mapbox://styles/nrproudfoot/pk.eyJ1IjoibnJwcm91ZGZvb3QiLCJhIjoiY2tpaXR6c25xMGtyaTJzbnhzZGx6bzg1dCJ9.p_Y3dmkMBoqdr6YC01po1A?optimize=true', // optimize=true,
     center: [50, 0],
-    zoom: 5
+    zoom: 5,
+    minZoom: 1,
+    maxBounds: (  [[-90,-180],   [90,180]]  ),
     })
 ;
 var Stadia_AlidadeSmooth = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
@@ -18,11 +20,23 @@ var capitalIcon = L.icon({
     
         iconSize:     [23, 50], // size of the icon
         shadowSize:   [25, 32], // size of the shadow
-        iconAnchor:   [10.5, 46], // point of the icon which will correspond to marker's location
+        iconAnchor:   [11.5, 50], // point of the icon which will correspond to marker's location
         shadowAnchor: [0, 32],  // the same for the shadow
         popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
     });
 var capitalMarker = L.marker([0,50], {icon: capitalIcon, zIndexOffset: 100});
+
+var youIcon = L.icon({
+    iconUrl: 'youpin.png',
+    shadowUrl: 'youshadow.png',
+
+    iconSize:     [60, 68], // size of the icon
+    shadowSize:   [75, 55], // size of the shadow
+    iconAnchor:   [30,68], // point of the icon which will correspond to marker's location
+    shadowAnchor: [0, 50],  // the same for the shadow
+    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+});
+var youMarker = L.marker([0,50], {icon: youIcon, zIndexOffset: 100});
 
 var sightsIcon = L.icon({
     iconUrl: 'bluepin.png',
@@ -30,8 +44,8 @@ var sightsIcon = L.icon({
 
     iconSize:     [17, 38], // size of the icon
     shadowSize:   [22, 27], // size of the shadow
-    iconAnchor:   [10.5, 46], // point of the icon which will correspond to marker's location
-    shadowAnchor: [0, 32],  // the same for the shadow
+    iconAnchor:   [8, 38], // point of the icon which will correspond to marker's location
+    shadowAnchor: [0, 27],  // the same for the shadow
     popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
 });
 var sightsGroup;
@@ -64,7 +78,7 @@ function createOptions(){
 }
 })
 }
-function getInfo(code){
+function getInfo(code, lat=null, lng=null){
     /* Get information about given country from getInfo.php */
     code = code.trim();
     $.ajax({
@@ -79,7 +93,7 @@ function getInfo(code){
             console.log(result);
             let country = result.data;
             addModalInfo(country);
-            addMapLayers(country);
+            addMapLayers(country, lat, lng);
         },
         error: function(jqXHR, textStatus, errorThrown) {
             console.log("Failure: Error getting API response from getInfo.php");
@@ -100,18 +114,27 @@ function addModalInfo(country){
 
     // Update modal html
     $("#name").html(country.name);
+    $("#nameCovid").html(country.name);
     $("#capital").html(country.capital);
     $("#population").html(population);
     $("#region").html(country.region);
     $("#flag").attr("src",country.flag);
     $("#currency").html(currency);
+    $("#cases").html(Number(country.covid.confirmed).toLocaleString());
+    $("#deaths").html(Number(country.covid.deaths).toLocaleString());
+    $("#7cases").html(Number(country.covid.weeklyconfirmed).toLocaleString());
+    $("#7deaths").html(Number(country.covid.weeklydeaths).toLocaleString());
 }
-function addMapLayers(country){
+function addMapLayers(country, lat=null, lng=null){
+    // Create you marker
+    if (lat != null){
+        let latlng = new L.LatLng(lat,lng);
+        youMarker.setLatLng(latlng).addTo(map);
+    }
     // Create sights markers
     let sights = [];
-    country.foursquare.forEach(sight => {
-        
-        sight = L.marker([sight.lat,sight.lng], {icon: sightsIcon}).bindPopup("<div style='text-align:center'}><h5>" + sight.name + "</h4><p>"+ sight.category + "</p><img src=" + sight.icon + "><br><p>" + sight.address.join(', ') + "</p></div>").openPopup();
+    country.foursquare.forEach(sight => { 
+        sight = L.marker([sight.lat,sight.lng], {icon: sightsIcon}).bindTooltip("<div style='text-align:center'}><h5>" + sight.name + "</h5><p>"+ sight.category + "</p><img src=" + sight.icon + "><br><div style='text-align: center'>" + sight.address.join(",<br>") + "</div></div>").openTooltip();
         sights.push(sight);
     });
     if (sightsGroup){
@@ -190,7 +213,7 @@ function getCountryCode(position){
 			lng: position.coords.longitude,
 		},
 		success: function(result){
-            getInfo(result);
+            getInfo(result, position.coords.latitude, position.coords.longitude);
             console.log("Success: Retrieved country code")
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
@@ -229,12 +252,8 @@ $("#collapseOne").on('click', function(e){
     
 
 })
-/*
-map.on('click', function(e){
-    console.log(e.target);
-    if ($("#collapseOne").open != true){
 
-    
+map.on('click', function(e){
     var latlng = e.latlng;
     $.ajax({
 		url: "getCountryCode.php",
@@ -245,7 +264,7 @@ map.on('click', function(e){
 			lng: latlng.lng,
 		},
 		success: function(result){
-            updateMap(result);
+            getInfo(result);
             console.log("Success: Retrieved country code");
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
@@ -253,8 +272,8 @@ map.on('click', function(e){
 }
 })
     }
-})
-*/
+)
+
 
 $('#bologna-list a').on('click', function (e) {
     e.preventDefault()

@@ -1,20 +1,93 @@
 #title {
+    display:block;
+    margin: 0 auto;
     font-family: roboto, sans-serif;
+    padding-left: 20px;
+    text-align: center;
 }
-
-
-
+body{
+    background-color: rgb(240, 240, 240);
+}
+.my-row {
+    justify-content: stretch;
+}
+.my-col {
+    align-self: stretch;
+}
+.button-row {
+    justify-content: stretch;
+    padding: 0;
+}
+.button-col {
+    align-self: stretch;
+    padding: 0;
+}
 
 #info {
     background-color: rgb(180, 179, 179);
     color: white;
 }
-
-#selectCountry {
-    margin: 15px;
+#whereto {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 0px;
+    text-align: center;
+    font-family: roboto, sans-serif;
+    font-size: 18px;
 }
-@media screen and (max-width: 576px){
-    #mapid { height: 400px; }
+#selectCountry {
+    display: block;
+    margin: 15px auto;
+}
+#mapid {
+    height:700px;
+}
+@media screen and (max-width: 390px){
+    #title {
+        font-family: roboto, sans-serif;
+        padding-left: 20px;
+        padding-top: 15px;
+        display: block;
+    }
+}
+@media screen and (max-width: 575px) and (max-height: 736px){
+    #title {
+        font-family: roboto, sans-serif;
+        padding-left: 20px;
+        padding-top: 15px;
+        display: block;
+    }
+    #selectCountry {
+        width: 150px;
+        margin: 5px auto;
+    }
+    #mapid {
+        height: 580px;
+    }
+    #whereto {
+        margin-top:0;
+    }
+
+}
+@media screen and (max-width: 414px) and (max-height: 731px){
+    #title {
+        font-family: roboto, sans-serif;
+        padding-left: 20px;
+        padding-top: 15px;
+        display: block;
+    }
+    #selectCountry {
+        width: 150px;
+    }
+    #mapid {
+        height: 672px;
+    }
+    #whereto {
+        margin-top: 0;
+    }
+}
+@media screen and (min-width: 576px){
+    #mapid { height: 700px; }
 }
 @media screen and (min-width: 768px){
     #mapid { height: 500px; }
@@ -58,25 +131,19 @@
 }
 
 #collapseOne, #collapseTwo, #collapseThree {
-    position: absolute;
+    position: block;
     background-color: #444444;
     border: 3px solid #777777;
     color: white;
-    top: 0;
-    right: 0;
-    width: 170px;
-    height: auto;
-    z-index: 314159;
-    pointer-events: auto;
+    width: 100%;
 }
 
 #headingOne, #headingTwo, #headingThree {
     background-color: white;
     border: 3px solid #444444;
     
-    top: 0;
-    right: 0;
-    width: 170px;
+    
+    
     height: auto;
 
 }

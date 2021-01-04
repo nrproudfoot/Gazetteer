@@ -18,27 +18,53 @@
 
     </head>
     <body>
-        <div class="container">
-            <div class="row">
-                <div class ="col-6">
-                    <h1 id="title">SpinGlobe</h1>
-                </div>
-                <div class="col-6">
-                    <select id="selectCountry"></select>
+        <div class="container-fluid">
+            <div class="row my-row">
+                
+                    <div class="col-12 col-md-4 col-lg-4 col-xl-4 my-col">
+                        <h1 id="title">SpinGlobe</h1>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-4 my-col">
+                        <p id="whereto">...where to?</p>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-4 my-col">
+                        <select id="selectCountry"></select>
+                    </div>
+                
+            </div>
                 </div>
             </div>
+            <div class="row button-row">
+                <div class="col-4 button-col">
+                    <button id="collapseOne" type="button" class="btn btn-secondary" data-toggle="modal" data-target="#detailsModal">
+                        Country Info
+                    </button>
+
+                </div>
+                <div class="col-4 button-col">
+                    <button id="collapseOne" type="button" class="btn btn-secondary" data-toggle="modal" data-target="#covidModal">
+                        Covid Stats
+                    </button>
+
+                </div>
+                <div class="col-4 button-col">
+                    <button id="collapseOne" type="button" class="btn btn-secondary" data-toggle="modal" data-target="#detailsModal">
+                        Country Info
+                    </button>
+
+                </div>
+            </div>
+            <div class="row">
             <div class="col-12">
-                <div class="mapbox">
+                <div class="mapbox-fluid">
                     <div class="row-fluid some" id="mapid">
                         
                         <!-- Button trigger modal -->
-                        <button id="collapseOne" type="button" class="btn btn-secondary" data-toggle="modal" data-target="#detailsModal">
-                            Country Info
-                        </button>
+                        
   
                         <!-- Modal -->
                         <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 id="name" class="modal-title" id="exampleModalLabel"></h5>
@@ -63,6 +89,40 @@
                                         <tr>
                                             <th>Currency:</th>
                                             <td id="currency"></td>
+                                        </tr>
+                                        
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal -->
+                    <div class="modal fade" id="covidModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 id="nameCovid" class="modal-title" id="exampleModalLabel"></h5>
+                                    <button  type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <table>
+                                        <tr>
+                                            <th>Total Confirmed Cases:</th>
+                                            <td  id="cases"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Deaths:</th>
+                                            <td id="deaths"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Last 7 days Confirmed Cases:</th>
+                                            <td id="7cases"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Last 7 days Deaths:</th>
+                                            <td id="7deaths"></td>
                                         </tr>
                                         
                                     </table>
@@ -156,6 +216,7 @@
                         </div> -->
                     </div>
                     </div>
+                </div>
             </div>
         </div>
 
