@@ -113,7 +113,9 @@ body{
 .mapbox .overlay .btn {
     pointer-events: initial;
 }
-
+.dropdown-menu {
+    width: auto;
+}
 #overlay {
     text-align: center;
     max-width: 20%;
@@ -130,7 +132,7 @@ body{
     z-index: 314159;
 }
 
-#collapseOne, #collapseTwo, #collapseThree {
+#collapseOne, #dropdownMenu2 {
     position: block;
     background-color: #444444;
     border: 3px solid #777777;

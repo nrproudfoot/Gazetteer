@@ -114,7 +114,7 @@ function addModalInfo(country){
 
     // Update modal html
     $("#name").html(country.name);
-    $("#nameCovid").html(country.name);
+    $("#name2").html(country.name);
     $("#capital").html(country.capital);
     $("#population").html(population);
     $("#region").html(country.region);
@@ -134,7 +134,7 @@ function addMapLayers(country, lat=null, lng=null){
     // Create sights markers
     let sights = [];
     country.foursquare.forEach(sight => { 
-        sight = L.marker([sight.lat,sight.lng], {icon: sightsIcon}).bindTooltip("<div style='text-align:center'}><h5>" + sight.name + "</h5><p>"+ sight.category + "</p><img src=" + sight.icon + "><br><div style='text-align: center'>" + sight.address.join(",<br>") + "</div></div>").openTooltip();
+        sight = L.marker([sight.lat,sight.lng], {icon: sightsIcon}).bindTooltip("<div style='text-align:center'}><h5>" + sight.name + "</h5><p>"+ sight.category + "</p><img src=" + sight.icon + "><br><div style='text-align: center'>" + sight.address.join(",<br>") + "</div></div>");
         sights.push(sight);
     });
     if (sightsGroup){
@@ -146,7 +146,7 @@ function addMapLayers(country, lat=null, lng=null){
     // Create capital city marker
     var capLatLng = new L.LatLng(country.weather.coord.lat,country.weather.coord.lon);
     capitalMarker.setLatLng(capLatLng).addTo(map);
-    capitalMarker.bindTooltip("<p><strong>Capital City: </strong><br>" + country.capital + "</p>").openTooltip();
+    capitalMarker.bindTooltip("<p><strong>Capital City: </strong><br>" + country.capital + "</p>");
     
     
 

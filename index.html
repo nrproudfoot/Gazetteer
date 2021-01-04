@@ -48,10 +48,61 @@
 
                 </div>
                 <div class="col-4 button-col">
-                    <button id="collapseOne" type="button" class="btn btn-secondary" data-toggle="modal" data-target="#detailsModal">
-                        Country Info
-                    </button>
-
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Options
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <form class="px-4 py-3">
+                              <div class="form-group">
+                                <label for="what">What do you want to see?</label>
+                                <div id="what" class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="history">
+                                    <label class="form-check-label" for="defaultCheck1">
+                                      Historical locations
+                                    </label>
+                                    <br>
+                                    <input class="form-check-input" type="checkbox" value="" id="parks">
+                                    <label class="form-check-label" for="defaultCheck1">
+                                      National Parks
+                                    </label>
+                                    <br>
+                                    <input class="form-check-input" type="checkbox" value="" id="earthquakes">
+                                    <label class="form-check-label" for="defaultCheck1">
+                                      Earthquake Locations
+                                    </label>
+                                    <br>
+                                    <input class="form-check-input" type="checkbox" value="" id="restaurants">
+                                    <label class="form-check-label" for="defaultCheck1">
+                                      Popular restaurants
+                                    </label>
+                                    <br>
+                                    <input class="form-check-input" type="checkbox" value="" id="bars">
+                                    <label class="form-check-label" for="defaultCheck1">
+                                      Bars and pubs
+                                    </label>
+                                    <br>
+                                  </div>
+                              </div>
+                              <label for="where">Where?</label>
+                              <div id="where" class="form-check">
+                                <input class="form-check-input" type="radio" name="where" id="where1" value="nearme" checked>
+                                <label class="form-check-label" for="where1">
+                                  Near me
+                                </label>
+                              </div>
+                              <div class="form-check">
+                                <input class="form-check-input" type="radio" name="where" id="where2" value="country">
+                                <label class="form-check-label" for="where2">
+                                  Selected Country
+                                </label>
+                              </div>
+                              <br>
+                            </form>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Like what you see? Hire me!</a>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -101,7 +152,7 @@
                         <div class="modal-dialog modal-dialog-centered" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 id="nameCovid" class="modal-title" id="exampleModalLabel"></h5>
+                                    <h5 id="name2" class="modal-title" id="exampleModalLabel"></h5>
                                     <button  type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
@@ -109,6 +160,10 @@
                                 <div class="modal-body">
                                     <table>
                                         <tr>
+                                            <tr>
+                                                <td colspan="2"><img width="100%" height="auto" src="/virus-4937553_1280.jpg"></td>
+                                                
+                                            </tr>
                                             <th>Total Confirmed Cases:</th>
                                             <td  id="cases"></td>
                                         </tr>
