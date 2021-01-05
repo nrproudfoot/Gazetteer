@@ -29,12 +29,18 @@
 	curl_setopt($ch, CURLOPT_URL,$url);
 	$result2 =curl_exec($ch);
 	$weather = json_decode($result2, true);
-
-	$foursquareurl = 'https://api.foursquare.com/v2/venues/explore?near=' . $slug . '&categoryId=4bf58dd8d48988d165941735,52e81612bcbc57f1066b7a21,56aa371be4b08b9a8d573560,4deefb944765f83613cdba6e&limit=25&sortByPopularity=1&client_id=' . $foursquareId . '&client_secret=' . $foursquareSecret . '&v=20210101';
+	// history
+	$foursquareurl = 'https://api.foursquare.com/v2/venues/explore?near=' . $slug . '&categoryId=4deefb944765f83613cdba6e&limit=25&sortByPopularity=1&client_id=' . $foursquareId . '&client_secret=' . $foursquareSecret . '&v=20210101';
     curl_setopt($ch, CURLOPT_URL,$foursquareurl);
 	$foursquareResult =curl_exec($ch);
 	$foursquare = json_decode($foursquareResult, true);
 	$foursquare = $foursquare['response']['groups'][0]['items'];
+	//parks
+	$parksurl = 'https://api.foursquare.com/v2/venues/explore?near=' . $slug . '&categoryId=52e81612bcbc57f1066b7a21&limit=25&client_id=' . $foursquareId . '&client_secret=' . $foursquareSecret . '&v=20210101';
+    curl_setopt($ch, CURLOPT_URL,$parksurl);
+	$parksResult =curl_exec($ch);
+	$parks = json_decode($parksResult, true);
+	$parks = $parks['response']['groups'][0]['items'];
 
 	// Get covid stats
 	$url = "https://api.covid19api.com/total/country/" . $_REQUEST['code'];
@@ -78,8 +84,20 @@
 			"category" => $venue['venue']['categories'][0]['name'],
 			"icon" => $venue['venue']['categories'][0]['icon']['prefix'] . "bg_32" . $venue['venue']['categories'][0]['icon']['suffix'],
 		];
-		array_push($foursquareVenues, $info);
-		
+		array_push($foursquareVenues, $info);	
+	};
+	$parksVenues = array();
+	foreach ($parks as $park){
+		$parkinfo = [
+			"id" => $park['venue']['id'],
+			"name" => $park['venue']['name'],
+			"lat" => $park['venue']['location']['lat'],
+			"lng" => $park['venue']['location']['lng'],
+			"address" => $park['venue']['location']['formattedAddress'],
+			"category" => $park['venue']['categories'][0]['name'],
+			"icon" => $park['venue']['categories'][0]['icon']['prefix'] . "bg_32" . $venue['venue']['categories'][0]['icon']['suffix'],
+		];
+		array_push($parksVenues, $parkinfo);	
 	};
 
 	// Format data object
@@ -95,6 +113,7 @@
         "weather" => $weather,
 		"features" => $feature,
 		"foursquare" => $foursquareVenues,
+		"parks" => $parksVenues,
 		"covid" => $latestData,
 		"allInfo" => $foursquareResult,
 		"slug" => $slug,

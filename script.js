@@ -24,8 +24,9 @@ var capitalIcon = L.icon({
         shadowAnchor: [0, 32],  // the same for the shadow
         popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
     });
+// Init capital marker
 var capitalMarker = L.marker([0,50], {icon: capitalIcon, zIndexOffset: 100});
-
+// Init YOU marker
 var youIcon = L.icon({
     iconUrl: 'youpin.png',
     shadowUrl: 'youshadow.png',
@@ -37,9 +38,9 @@ var youIcon = L.icon({
     popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
 });
 var youMarker = L.marker([0,50], {icon: youIcon, zIndexOffset: 100});
-
+// Init history marker
 var sightsIcon = L.icon({
-    iconUrl: 'bluepin.png',
+    iconUrl: 'orangepin.png',
     shadowUrl: 'pinshadow.png',
 
     iconSize:     [17, 38], // size of the icon
@@ -49,6 +50,42 @@ var sightsIcon = L.icon({
     popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
 });
 var sightsGroup;
+//Init parks marker
+var parksIcon = L.icon({
+    iconUrl: 'bluepin.png',
+    shadowUrl: 'pinshadow.png',
+
+    iconSize:     [17, 38], // size of the icon
+    shadowSize:   [22, 27], // size of the shadow
+    iconAnchor:   [8, 38], // point of the icon which will correspond to marker's location
+    shadowAnchor: [0, 27],  // the same for the shadow
+    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+});
+var parksGroup;
+// Init food marker
+var foodIcon = L.icon({
+    iconUrl: 'yellowpin.png',
+    shadowUrl: 'pinshadow.png',
+
+    iconSize:     [17, 38], // size of the icon
+    shadowSize:   [22, 27], // size of the shadow
+    iconAnchor:   [8, 38], // point of the icon which will correspond to marker's location
+    shadowAnchor: [0, 27],  // the same for the shadow
+    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+});
+var foodGroup;
+// Init bars marker
+var barsIcon = L.icon({
+    iconUrl: 'navypin.png',
+    shadowUrl: 'pinshadow.png',
+
+    iconSize:     [17, 38], // size of the icon
+    shadowSize:   [22, 27], // size of the shadow
+    iconAnchor:   [8, 38], // point of the icon which will correspond to marker's location
+    shadowAnchor: [0, 27],  // the same for the shadow
+    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+});
+var barsGroup;
 
 // Helper functions
 
@@ -141,6 +178,40 @@ function addMapLayers(country, lat=null, lng=null){
         sightsGroup.clearLayers();
     }
     sightsGroup = L.layerGroup(sights).addTo(map);
+
+    
+    // Create parks markers
+    let parks = [];
+    country.parks.forEach(park => { 
+        park = L.marker([park.lat,park.lng], {icon: parksIcon}).bindTooltip("<div style='text-align:center'}><h5>" + park.name + "</h5><p>"+ park.category + "</p><img src=" + park.icon + "><br><div style='text-align: center'>" + park.address.join(",<br>") + "</div></div>");
+        parks.push(park);
+    });
+    if (parksGroup){
+        parksGroup.clearLayers();
+    }
+    console.log(parks);
+    parksGroup = L.layerGroup(parks).addTo(map);
+   /*/ Create food markers
+   let food = [];
+   country.food.forEach(sight => { 
+       sight = L.marker([sight.lat,sight.lng], {icon: sightsIcon}).bindTooltip("<div style='text-align:center'}><h5>" + sight.name + "</h5><p>"+ sight.category + "</p><img src=" + sight.icon + "><br><div style='text-align: center'>" + sight.address.join(",<br>") + "</div></div>");
+       food.push(sight);
+   });
+   if (foodGroup){
+       foodGroup.clearLayers();
+   }
+   foodGroup = L.layerGroup(food).addTo(map);
+   // Create bars markers
+   let bars = [];
+   country.bars.forEach(sight => { 
+       sight = L.marker([sight.lat,sight.lng], {icon: sightsIcon}).bindTooltip("<div style='text-align:center'}><h5>" + sight.name + "</h5><p>"+ sight.category + "</p><img src=" + sight.icon + "><br><div style='text-align: center'>" + sight.address.join(",<br>") + "</div></div>");
+       bars.push(sight);
+   });
+   if (barsGroup){
+       barsGroup.clearLayers();
+   }
+   barsGroup = L.layerGroup(bars).addTo(map);
+  */
    
 
     // Create capital city marker
@@ -227,8 +298,10 @@ function getCountryCode(position){
     var x = $("#demo");
      if (navigator.geolocation) {
          navigator.geolocation.getCurrentPosition(getCountryCode);
+
      } else {
         console.log("Failure: Geolocation not enabled");
+        getInfo('GB');
      }
  }
  
