@@ -1,3 +1,93 @@
+// Initialise options object
+
+class Options {
+    constructor(){
+        this.history = true;
+        this.parks = true;
+        this.earthquakes = true;
+        this.food = true;
+        this.bars = true;
+        this.sort = "near";
+        this.location;
+    }
+    setHistory(){
+        if (this.history === true){
+            this.history = false;
+        } else {
+            this.history = true;
+        }
+    }
+    setParks(){
+        if (this.parks === true){
+            this.parks = false;
+        } else {
+            this.parks = true;
+        }
+    }
+    setEarthquakes(){
+        if (this.earthquakes === true){
+            this.earthquakes = false;
+        } else {
+            this.earthquakes = true;
+        }
+    }
+    setFood(){
+        if (this.food === true){
+            this.food = false;
+        } else {
+            this.food = true;
+        }
+    }
+    setBars(){
+        if (this.bars === true){
+            this.bars = false;
+        } else {
+            this.bars = true;
+        }
+    }
+    setSort(sort){
+        if (sort === "near" || sort === "country"){
+            this.sort = sort;
+        } else {
+            alert("There was an error");
+        } 
+    }
+    setLocation(location){
+        if(typeof location == "array" && location.length == 2 && typeof location[0] == "number"){
+            this.location = location;
+        }
+    }
+    getLocation(){
+        console.log(this.location);
+        return this.location;
+    }
+    getHistory(){
+        console.log(this.history);
+        return this.history;
+    }
+    getParks(){
+        console.log(this.parks);
+        return this.parks;
+    }
+    getEarthquakes(){
+        console.log(this.earthquakes);
+        return this.earthquakes;
+    }
+    getFood(){
+        console.log(this.food);
+        return this.food;
+    }
+    getBars(){
+        console.log(this.bars);
+        return this.bars;
+    }
+    getSort(){
+        console.log(this.sort);
+        return this.sort
+    }
+};
+let mapOpts = new Options();
+
 // Initialise map as global var
 var map = new L.Map("mapid", {
     container: 'map',
@@ -40,7 +130,7 @@ var youIcon = L.icon({
 var youMarker = L.marker([0,50], {icon: youIcon, zIndexOffset: 100});
 // Init history marker
 var sightsIcon = L.icon({
-    iconUrl: 'orangepin.png',
+    iconUrl: 'historypin.png',
     shadowUrl: 'pinshadow.png',
 
     iconSize:     [17, 38], // size of the icon
@@ -52,7 +142,7 @@ var sightsIcon = L.icon({
 var sightsGroup;
 //Init parks marker
 var parksIcon = L.icon({
-    iconUrl: 'bluepin.png',
+    iconUrl: 'parkspin.png',
     shadowUrl: 'pinshadow.png',
 
     iconSize:     [17, 38], // size of the icon
@@ -76,7 +166,7 @@ var foodIcon = L.icon({
 var foodGroup;
 // Init bars marker
 var barsIcon = L.icon({
-    iconUrl: 'navypin.png',
+    iconUrl: 'barsicon.png',
     shadowUrl: 'pinshadow.png',
 
     iconSize:     [17, 38], // size of the icon
@@ -86,6 +176,18 @@ var barsIcon = L.icon({
     popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
 });
 var barsGroup;
+// Init earthquake marker
+var eqIcon = L.icon({
+    iconUrl: 'eqpin.png',
+    shadowUrl: 'pinshadow.png',
+
+    iconSize:     [17, 38], // size of the icon
+    shadowSize:   [22, 27], // size of the shadow
+    iconAnchor:   [8, 38], // point of the icon which will correspond to marker's location
+    shadowAnchor: [0, 27],  // the same for the shadow
+    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+});
+var eqGroup;
 
 // Helper functions
 
@@ -115,7 +217,7 @@ function createOptions(){
 }
 })
 }
-function getInfo(code, lat=null, lng=null){
+function getInfo(code, options, lat=null, lng=null){
     /* Get information about given country from getInfo.php */
     code = code.trim();
     $.ajax({
@@ -130,7 +232,7 @@ function getInfo(code, lat=null, lng=null){
             console.log(result);
             let country = result.data;
             addModalInfo(country);
-            addMapLayers(country, lat, lng);
+            addMapLayers(country, options, lat, lng);
         },
         error: function(jqXHR, textStatus, errorThrown) {
             console.log("Failure: Error getting API response from getInfo.php");
@@ -162,58 +264,80 @@ function addModalInfo(country){
     $("#7cases").html(Number(country.covid.weeklyconfirmed).toLocaleString());
     $("#7deaths").html(Number(country.covid.weeklydeaths).toLocaleString());
 }
-function addMapLayers(country, lat=null, lng=null){
+function addMapLayers(country, options, lat=null, lng=null){
     // Create you marker
     if (lat != null){
         let latlng = new L.LatLng(lat,lng);
         youMarker.setLatLng(latlng).addTo(map);
     }
     // Create sights markers
+    if (sightsGroup){
+        sightsGroup.clearLayers();
+    }
     let sights = [];
     country.foursquare.forEach(sight => { 
         sight = L.marker([sight.lat,sight.lng], {icon: sightsIcon}).bindTooltip("<div style='text-align:center'}><h5>" + sight.name + "</h5><p>"+ sight.category + "</p><img src=" + sight.icon + "><br><div style='text-align: center'>" + sight.address.join(",<br>") + "</div></div>");
         sights.push(sight);
     });
-    if (sightsGroup){
-        sightsGroup.clearLayers();
+    sightsGroup = L.layerGroup(sights);
+    if(options.getHistory() == true){
+        sightsGroup.addTo(map);
     }
-    sightsGroup = L.layerGroup(sights).addTo(map);
-
-    
     // Create parks markers
+    if (parksGroup){
+        parksGroup.clearLayers();
+    }
     let parks = [];
     country.parks.forEach(park => { 
         park = L.marker([park.lat,park.lng], {icon: parksIcon}).bindTooltip("<div style='text-align:center'}><h5>" + park.name + "</h5><p>"+ park.category + "</p><img src=" + park.icon + "><br><div style='text-align: center'>" + park.address.join(",<br>") + "</div></div>");
         parks.push(park);
     });
-    if (parksGroup){
-        parksGroup.clearLayers();
+    parksGroup = L.layerGroup(parks);
+    if(options.getParks() == true){
+        parksGroup.addTo(map);
     }
-    console.log(parks);
-    parksGroup = L.layerGroup(parks).addTo(map);
-   /*/ Create food markers
-   let food = [];
-   country.food.forEach(sight => { 
-       sight = L.marker([sight.lat,sight.lng], {icon: sightsIcon}).bindTooltip("<div style='text-align:center'}><h5>" + sight.name + "</h5><p>"+ sight.category + "</p><img src=" + sight.icon + "><br><div style='text-align: center'>" + sight.address.join(",<br>") + "</div></div>");
-       food.push(sight);
-   });
-   if (foodGroup){
-       foodGroup.clearLayers();
-   }
-   foodGroup = L.layerGroup(food).addTo(map);
+   // Create food markers
+    if (foodGroup){
+        foodGroup.clearLayers();
+    }
+    let food = [];
+    country.food.forEach(sight => { 
+        sight = L.marker([sight.lat,sight.lng], {icon: foodIcon}).bindTooltip("<div style='text-align:center'}><h5>" + sight.name + "</h5><p>"+ sight.category + "</p><img src=" + sight.icon + "><br><div style='text-align: center'>" + sight.address.join(",<br>") + "</div></div>");
+        food.push(sight);
+    });
+    foodGroup = L.layerGroup(food);
+    if(options.getFood() == true){
+        foodGroup.addTo(map);
+    }
+    
    // Create bars markers
-   let bars = [];
-   country.bars.forEach(sight => { 
-       sight = L.marker([sight.lat,sight.lng], {icon: sightsIcon}).bindTooltip("<div style='text-align:center'}><h5>" + sight.name + "</h5><p>"+ sight.category + "</p><img src=" + sight.icon + "><br><div style='text-align: center'>" + sight.address.join(",<br>") + "</div></div>");
-       bars.push(sight);
-   });
-   if (barsGroup){
-       barsGroup.clearLayers();
-   }
-   barsGroup = L.layerGroup(bars).addTo(map);
-  */
+    if (barsGroup){
+         barsGroup.clearLayers();
+    }
+    let bars = [];
+    country.bars.forEach(sight => { 
+        sight = L.marker([sight.lat,sight.lng], {icon: barsIcon}).bindTooltip("<div style='text-align:center'}><h5>" + sight.name + "</h5><p>"+ sight.category + "</p><img src=" + sight.icon + "><br><div style='text-align: center'>" + sight.address.join(",<br>") + "</div></div>");
+        bars.push(sight);
+    });
+    barsGroup = L.layerGroup(bars);
+    if(options.getBars() == true){
+        barsGroup.addTo(map);
+    }
+   // Create eq markers
+    if (eqGroup){
+        eqGroup.clearLayers();
+    }
+    let eq = [];
+    let earthquakes = country.earthquakes.earthquakes;
+    earthquakes.forEach(sight => { 
+        sight = L.marker([sight.lat,sight.lng], {icon: eqIcon}).bindTooltip("<table style='text-align:left'><tr><th colspan=2 style='text-align:center'>Earthquake<th></tr><tr><th>Date</th><td>" + sight.datetime + "</td></tr><tr><th>Magnitude</th><td>" + sight.magnitude + "</td></tr><tr><th>Depth</th><td>" + sight.depth + "</td></tr></table></div>");
+        eq.push(sight);
+    });
+    eqGroup = L.layerGroup(eq);
+    if(options.getEarthquakes() == true){     
+        eqGroup.addTo(map);
+    }
    
-
     // Create capital city marker
     var capLatLng = new L.LatLng(country.weather.coord.lat,country.weather.coord.lon);
     capitalMarker.setLatLng(capLatLng).addTo(map);
@@ -275,6 +399,7 @@ function addMapLayers(country, lat=null, lng=null){
 function getCountryCode(position){
     /* Call API to get country code from lat,lng */
     console.log("Success: Retrieved location");
+    mapOpts.setLocation([position.coords.latitude,position.coords.longitude]);
     $.ajax({
 		url: "getCountryCode.php",
 		type: 'POST',
@@ -284,7 +409,7 @@ function getCountryCode(position){
 			lng: position.coords.longitude,
 		},
 		success: function(result){
-            getInfo(result, position.coords.latitude, position.coords.longitude);
+            getInfo(result, mapOpts, position.coords.latitude, position.coords.longitude);
             console.log("Success: Retrieved country code")
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
@@ -297,13 +422,11 @@ function getCountryCode(position){
  function getLocation() {
     var x = $("#demo");
      if (navigator.geolocation) {
-         navigator.geolocation.getCurrentPosition(getCountryCode);
-
-     } else {
-        console.log("Failure: Geolocation not enabled");
-        getInfo('GB');
-     }
- }
+         navigator.geolocation.getCurrentPosition(getCountryCode, ()=>{
+             console.log("Error finding location");
+             getInfo("GB", mapOpts);
+         });
+ }}
  
      
 
@@ -317,7 +440,8 @@ $(window).on('load', function (){
 
 $("#selectCountry").on('change', function(e){
     let country = $("#selectCountry");
-    getInfo(country.val());
+    mapOpts.setLocation("country");
+    getInfo(country.val(), mapOpts);
 })
 $("#collapseOne").on('click', function(e){
     console.log(e.target);
@@ -346,6 +470,49 @@ map.on('click', function(e){
 })
     }
 )
+
+
+$("#history").on("change", function(e){
+    mapOpts.setHistory();
+    if(mapOpts.getHistory()){
+        sightsGroup.addTo(map);     
+    } else {
+        map.removeLayer(sightsGroup);   
+    };
+})
+$("#parks").on("change", function(e){
+    mapOpts.setParks();
+    if(mapOpts.getParks()){
+        parksGroup.addTo(map);
+    } else {
+        map.removeLayer(parksGroup);  
+    };
+
+})
+$("#earthquakes").on("change",function(e){
+    mapOpts.setEarthquakes();
+    if(mapOpts.getEarthquakes()){
+        eqGroup.addTo(map);
+    } else {
+        map.removeLayer(eqGroup);
+    };
+})
+$('#restaurants').on("change",function(e){
+    mapOpts.setFood();
+    if(mapOpts.getFood()){
+        foodGroup.addTo(map);
+    } else {
+        map.removeLayer(foodGroup);
+    };
+})
+$('#bars').on("change",function(e){
+    mapOpts.setBars();
+    if(mapOpts.getBars()){
+        barsGroup.addTo(map);
+    } else {
+        map.removeLayer(barsGroup);
+    };
+})
 
 
 $('#bologna-list a').on('click', function (e) {
