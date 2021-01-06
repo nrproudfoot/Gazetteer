@@ -7,8 +7,9 @@ class Options {
         this.earthquakes = true;
         this.food = true;
         this.bars = true;
-        this.sort = "near";
+        this.sort = "country";
         this.location;
+        this.clickLocation;
     }
     setHistory(){
         if (this.history === true){
@@ -53,40 +54,77 @@ class Options {
         } 
     }
     setLocation(location){
-        if(typeof location == "array" && location.length == 2 && typeof location[0] == "number"){
             this.location = location;
-        }
     }
     getLocation(){
-        console.log(this.location);
         return this.location;
     }
+    setClickLocation(location){
+        this.clickLocation = location;
+    }
+    getClickLocation(){
+        return this.clickLocation;
+    }
+    getClickLat(){
+        return this.clickLocation[0];
+    }
+    getClickLng(){
+        return this.clickLocation[1];
+    }
+    getLat(){
+        return this.location[0];
+    }
+    getLng(){
+        return this.location[1];
+    }
     getHistory(){
-        console.log(this.history);
         return this.history;
     }
     getParks(){
-        console.log(this.parks);
         return this.parks;
     }
     getEarthquakes(){
-        console.log(this.earthquakes);
         return this.earthquakes;
     }
     getFood(){
-        console.log(this.food);
         return this.food;
     }
     getBars(){
-        console.log(this.bars);
         return this.bars;
     }
     getSort(){
-        console.log(this.sort);
         return this.sort
     }
 };
+class Data {
+    constructor(){
+        this.info;
+        this.localInfo = null;
+        this.bounds;
+    }
+    setCountryInfo(data){
+        this.info = data
+        }  
+    setLocalInfo(data){
+        this.localInfo = data
+    }
+    getCountryInfo(){
+        return this.info;
+    }
+    getLocalInfo(){
+        return this.localInfo;
+    }
+    setBoundary(bounds){
+        this.bounds = bounds;
+    }
+    getBoundary(){
+        return this.bounds;
+    }
+}
+
 let mapOpts = new Options();
+let data = new Data();
+var circle;
 
 // Initialise map as global var
 var map = new L.Map("mapid", {
@@ -217,27 +255,113 @@ function createOptions(){
 }
 })
 }
-function getInfo(code, options, lat=null, lng=null){
+function getInfo(code, options){
     /* Get information about given country from getInfo.php */
-    code = code.trim();
-    $.ajax({
-		url: "getInfo.php",
-		type: 'GET',
-        dataType: 'json',
-        data: {
-            code: code,
-        },
-        success: function(result){
-            console.log("Success: Recieved API response from getInfo.php");
-            console.log(result);
-            let country = result.data;
-            addModalInfo(country);
-            addMapLayers(country, options, lat, lng);
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            console.log("Failure: Error getting API response from getInfo.php");
-        }
-    });
+    if(code){  // If country code provided
+        code = code.trim();
+        $.ajax({
+		    url: "getInfo.php",
+		    type: 'GET',
+            dataType: 'json',
+            data: {
+                code: code,
+            },
+            success: function(result){
+                console.log("Success: Recieved API response from getInfo.php");
+                data.setCountryInfo(result.data);
+                console.log(result.status);
+                addModalInfo(data.getCountryInfo());
+                addBasicLayers(data.getCountryInfo(), options);
+                if (options.sort == "country"){
+                    addInterestLayers(data.getCountryInfo(), options);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log("Failure: Error getting API response from getInfo.php");
+            }
+        });
+    } else if (options.getClickLocation()) { // Else if map has been clicked
+        $.ajax({
+		    url: "getInfo.php",
+		    type: 'GET',
+            dataType: 'json',
+            data: {
+                code: null,
+                lat: options.getClickLat(),
+                lng: options.getClickLng(),
+            },
+            success: function(result){
+                console.log("Success: Recieved API response from getInfo.php");
+                options.setClickLocation(null);
+                data.setCountryInfo(result.data);
+                console.log(result.status);
+                addModalInfo(data.getCountryInfo());
+                addBasicLayers(data.getCountryInfo(), options);
+                if (options.sort == "country"){
+                    addInterestLayers(data.getCountryInfo(), options);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log("Failure: Error getting API response from getInfo.php");
+            }
+        });
+    } else { // Else no code or map click
+        $.ajax({
+		    url: "getInfo.php",
+		    type: 'GET',
+            dataType: 'json',
+            data: {
+                code: null,
+                lat: options.getLat(),
+                lng: options.getLng(),
+            },
+            success: function(result){
+                console.log("Success: Recieved API response from getInfo.php",result);
+                options.setClickLocation(null);
+                data.setCountryInfo(result.data);
+                console.log(result.status);
+                addModalInfo(data.getCountryInfo());
+                addBasicLayers(data.getCountryInfo(), options);
+                if (options.sort == "country"){
+                    addInterestLayers(data.getCountryInfo(), options);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log("Failure: Error getting API response from getInfo.php");
+            }
+        });
+    };
+    if (!data.getLocalInfo()){
+        $.ajax({
+		    url: "getLocalInfo.php",
+		    type: 'GET',
+            dataType: 'json',
+            data: {
+                lat: options.getLat(),
+                lng: options.getLng(),
+            },
+            success: function(result){
+                console.log("Success: Recieved API response from getLocalInfo.php");
+                data.setLocalInfo(result.data);
+                console.log(result.status);
+                if (options.sort == "near"){
+                    addInterestLayers(data.getLocalInfo(), options);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log("Failure: Error getting API response from getLocalInfo.php");
+            }
+            });
+    }
+    if (options.getSort() == "near"){
+        addInterestLayers(data.getLocalInfo(), options);
+    }
+}
+function addLocalRadius(options){
+    if (circle){
+        map.removeLayer(circle)
+    };
+    circle = L.circle([options.getLat(),options.getLng()], {radius: 15000}).addTo(map);
 }
 function addModalInfo(country){
     
@@ -264,12 +388,7 @@ function addModalInfo(country){
     $("#7cases").html(Number(country.covid.weeklyconfirmed).toLocaleString());
     $("#7deaths").html(Number(country.covid.weeklydeaths).toLocaleString());
 }
-function addMapLayers(country, options, lat=null, lng=null){
-    // Create you marker
-    if (lat != null){
-        let latlng = new L.LatLng(lat,lng);
-        youMarker.setLatLng(latlng).addTo(map);
-    }
+function addInterestLayers(country, options){
     // Create sights markers
     if (sightsGroup){
         sightsGroup.clearLayers();
@@ -337,15 +456,18 @@ function addMapLayers(country, options, lat=null, lng=null){
     if(options.getEarthquakes() == true){     
         eqGroup.addTo(map);
     }
-   
+}
+function addBasicLayers(country, options){
+    // Create you marker
+    if (options.getLocation()){
+        let latlng = new L.LatLng(options.getLat(),options.getLng());
+        youMarker.setLatLng(latlng).addTo(map);
+    }
     // Create capital city marker
     var capLatLng = new L.LatLng(country.weather.coord.lat,country.weather.coord.lon);
     capitalMarker.setLatLng(capLatLng).addTo(map);
     capitalMarker.bindTooltip("<p><strong>Capital City: </strong><br>" + country.capital + "</p>");
-    
-    
 
-    
     // Add boundary border to map
     // Reverse coordinates for creating bounds
     country = country.features;
@@ -384,6 +506,7 @@ function addMapLayers(country, options, lat=null, lng=null){
         })
     }
     let bounds = new L.LatLngBounds(coords);
+    data.setBoundary(bounds);
     map.fitBounds(bounds);
     var currentCountry = country;
     if (boundaryLayer)
@@ -396,36 +519,20 @@ function addMapLayers(country, options, lat=null, lng=null){
     document.getElementById('selectCountry').value=country.properties.iso_a2;
 }
 
-function getCountryCode(position){
-    /* Call API to get country code from lat,lng */
-    console.log("Success: Retrieved location");
-    mapOpts.setLocation([position.coords.latitude,position.coords.longitude]);
-    $.ajax({
-		url: "getCountryCode.php",
-		type: 'POST',
-		dataType: 'json',
-		data: {
-            lat: position.coords.latitude,
-			lng: position.coords.longitude,
-		},
-		success: function(result){
-            getInfo(result, mapOpts, position.coords.latitude, position.coords.longitude);
-            console.log("Success: Retrieved country code")
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log("Failure: Error getting country code from getCountryCode.php");
-}
-	})
-}
 // get user location
 
  function getLocation() {
     var x = $("#demo");
      if (navigator.geolocation) {
-         navigator.geolocation.getCurrentPosition(getCountryCode, ()=>{
+         navigator.geolocation.getCurrentPosition((position)=> {
+            console.log("Success: Retrieved location");
+            mapOpts.setLocation([position.coords.latitude,position.coords.longitude]);
+            getInfo(null,mapOpts)
+         }),
+          ()=>{
              console.log("Error finding location");
              getInfo("GB", mapOpts);
-         });
+         };
  }}
  
      
@@ -440,7 +547,7 @@ $(window).on('load', function (){
 
 $("#selectCountry").on('change', function(e){
     let country = $("#selectCountry");
-    mapOpts.setLocation("country");
+    mapOpts.setSort("country");
     getInfo(country.val(), mapOpts);
 })
 $("#collapseOne").on('click', function(e){
@@ -451,25 +558,9 @@ $("#collapseOne").on('click', function(e){
 })
 
 map.on('click', function(e){
-    var latlng = e.latlng;
-    $.ajax({
-		url: "getCountryCode.php",
-		type: 'POST',
-		dataType: 'json',
-		data: {
-            lat: latlng.lat,
-			lng: latlng.lng,
-		},
-		success: function(result){
-            getInfo(result);
-            console.log("Success: Retrieved country code");
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log("Failure: Error getting country code from getCountryCode.php");
-}
+    mapOpts.setClickLocation([e.latlng.lat,e.latlng.lng]);
+    getInfo(null, mapOpts);
 })
-    }
-)
 
 
 $("#history").on("change", function(e){
@@ -512,6 +603,26 @@ $('#bars').on("change",function(e){
     } else {
         map.removeLayer(barsGroup);
     };
+})
+
+$('#where').on('change',function(e){
+    if (mapOpts.getSort() == "country"){
+        if (mapOpts.getLocation()){
+            mapOpts.setSort("near");
+            addLocalRadius(mapOpts);
+            map.fitBounds(circle.getBounds());
+            addInterestLayers(data.getLocalInfo(),mapOpts);
+        } else {
+            alert("I need location data to show points of interest near you!");
+            $('#where2').attr('checked');
+        }
+    } else {
+        mapOpts.setSort("country");
+        map.removeLayer(circle);
+        map.fitBounds(data.getBoundary());
+        addInterestLayers(data.getCountryInfo(),mapOpts);
+    };
+    console.log(mapOpts.getSort());
 })
 
 
