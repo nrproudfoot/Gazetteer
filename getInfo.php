@@ -89,8 +89,18 @@ if (count($feature['geometry']['coordinates']) > 1){
     }
 };
 
+    $ch = curl_init();
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_URL,"https://restcountries.eu/rest/v2/alpha/" . $code);
+	$result=curl_exec($ch);
+	curl_close($ch);
+
+	$restcountry = json_decode($result,true);
+
+
+
     //Create curl resources
-    $ch1 = curl_init();
     $ch2 = curl_init();
     $ch3 = curl_init();
     $ch4 = curl_init();
@@ -101,12 +111,9 @@ if (count($feature['geometry']['coordinates']) > 1){
     $ch9 = curl_init();
 
     // set url and options
-    curl_setopt($ch1, CURLOPT_SSL_VERIFYPEER, false);
-	curl_setopt($ch1, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch1, CURLOPT_URL,'http://api.geonames.org/countryInfoJSON?formatted=true&country=' . $code . '&username=nrproudfoot&style=full');
     curl_setopt($ch2, CURLOPT_SSL_VERIFYPEER, false);
 	curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch2, CURLOPT_URL,'https://restcountries.eu/rest/v2/alpha/' . $code);
+    curl_setopt($ch2, CURLOPT_URL,'http://api.geonames.org/countryInfoJSON?formatted=true&country=' . $code . '&username=nrproudfoot&style=full');
     curl_setopt($ch3, CURLOPT_SSL_VERIFYPEER, false);
 	curl_setopt($ch3, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch3, CURLOPT_URL,'https://api.openweathermap.org/data/2.5/weather?q=' . $restcountry['capital'] . ',' . $code . '&appid=' . $openWeatherId);
@@ -133,7 +140,6 @@ if (count($feature['geometry']['coordinates']) > 1){
     $mh = curl_multi_init();
 
     // Add handles
-    curl_multi_add_handle($mh,$ch1);
     curl_multi_add_handle($mh,$ch2);
     curl_multi_add_handle($mh,$ch3);
     curl_multi_add_handle($mh,$ch4);
@@ -152,15 +158,20 @@ if (count($feature['geometry']['coordinates']) > 1){
     } while ($active && $status == CURLM_OK);
 
 //close the handles
-curl_multi_remove_handle($mh, $ch1);
 curl_multi_remove_handle($mh, $ch2);
+curl_multi_remove_handle($mh, $ch3);
+curl_multi_remove_handle($mh, $ch4);
+curl_multi_remove_handle($mh, $ch5);
+curl_multi_remove_handle($mh, $ch6);
+curl_multi_remove_handle($mh, $ch7);
+curl_multi_remove_handle($mh, $ch8);
+curl_multi_remove_handle($mh, $ch9);
 curl_multi_close($mh);
 
 
 
-$country = json_decode(curl_multi_getcontent($ch1),true);
+$country = json_decode(curl_multi_getcontent($ch2),true);
 $country = $country['geonames'][0];
-$restcountry = json_decode(curl_multi_getcontent($ch2),true);
 $weather = json_decode(curl_multi_getcontent($ch3),true);
 $foursquare = json_decode(curl_multi_getcontent($ch4),true);
 $foursquare = $foursquare['response']['groups'][0]['items'];

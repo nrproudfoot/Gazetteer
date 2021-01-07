@@ -8,7 +8,7 @@ class Options {
         this.food = true;
         this.bars = true;
         this.sort = "country";
-        this.location;
+        this.location = null;
         this.clickLocation;
     }
     setHistory(){
@@ -534,7 +534,8 @@ function addBasicLayers(country, options){
              console.log("Error finding location");
              getInfo("GB", mapOpts);
          };
- }}
+ };
+};
  
      
 
@@ -542,6 +543,11 @@ function addBasicLayers(country, options){
 $(window).on('load', function (){
    createOptions();
    getLocation();
+   setTimeout(function(){
+    if (!mapOpts.getLocation()){
+        getInfo("GB",mapOpts);
+    }
+}, 1000);
    
 
 })
@@ -559,6 +565,7 @@ $("#collapseOne").on('click', function(e){
 })
 
 map.on('click', function(e){
+    console.log(e);
     mapOpts.setClickLocation([e.latlng.lat,e.latlng.lng]);
     getInfo(null, mapOpts);
 })
@@ -615,7 +622,7 @@ $('#where').on('change',function(e){
             addInterestLayers(data.getLocalInfo(),mapOpts);
         } else {
             alert("I need location data to show points of interest near you!");
-            $('#where2').attr('checked');
+            $("#where2").prop("checked",true);
         }
     } else {
         mapOpts.setSort("country");
@@ -625,9 +632,3 @@ $('#where').on('change',function(e){
     };
     console.log(mapOpts.getSort());
 })
-
-
-$('#bologna-list a').on('click', function (e) {
-    e.preventDefault()
-    $(this).tab('show')
-  })
