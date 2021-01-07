@@ -269,7 +269,7 @@ function getInfo(code, options){
             success: function(result){
                 console.log("Success: Recieved API response from getInfo.php");
                 data.setCountryInfo(result.data);
-                console.log(result.status);
+                console.log(result.data);
                 addModalInfo(data.getCountryInfo());
                 addBasicLayers(data.getCountryInfo(), options);
                 if (options.sort == "country"){
@@ -292,6 +292,7 @@ function getInfo(code, options){
             },
             success: function(result){
                 console.log("Success: Recieved API response from getInfo.php");
+                console.log(result.data);
                 options.setClickLocation(null);
                 data.setCountryInfo(result.data);
                 console.log(result.status);
@@ -319,7 +320,7 @@ function getInfo(code, options){
                 console.log("Success: Recieved API response from getInfo.php",result);
                 options.setClickLocation(null);
                 data.setCountryInfo(result.data);
-                console.log(result.status);
+                console.log(result.data);
                 addModalInfo(data.getCountryInfo());
                 addBasicLayers(data.getCountryInfo(), options);
                 if (options.sort == "country"){
