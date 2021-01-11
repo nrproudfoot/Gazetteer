@@ -21,11 +21,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Arvo&family=Roboto:wght@100&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;500&display=swap" rel="stylesheet">
+    <title>SpinGlobe</title>
 
     </head>
     <body>
-        
-        <div class="container-fluid">
+        <div class="container-fluid header" >
             <div class="row my-row">
                 
                     <div class="col-12 col-md-4 col-lg-4 col-xl-4 my-col">
@@ -117,11 +117,8 @@
                 </div>
             </div>
         </div>
-        <div class= container-fluid>
-           
-            <div class="row">
-            <div class="col-12">
-                <div class="mapbox-fluid">
+        <div class= container-fluid id="mapArea">
+                <div class="mapbox-fluid" id="mapDiv">
                     <div class="se-pre-con">
                         <div id="loadingText" class="loadingText"></div>
                     </div>
@@ -245,8 +242,6 @@
                     <div class="row-fluid some" id="mapid">
                     </div>
                     </div>
-                </div>
-            </div>
         </div>
 
         <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
