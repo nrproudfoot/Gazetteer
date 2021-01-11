@@ -7,7 +7,7 @@
 	$executionStartTime = microtime(true);
 
 	// Get weather information for location
-	$url='https://api.openweathermap.org/data/2.5/weather?lat=' . round($_REQUEST['lat'],1) . '&lon=' . round($_REQUEST['lng'],1) . '&appid=' . $openWeatherId;
+	$url='https://api.openweathermap.org/data/2.5/weather?lat=' . round($_REQUEST['lat'],1) . '&lon=' . round($_REQUEST['lng'],1) . '&units=metric&appid=' . $openWeatherId;
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

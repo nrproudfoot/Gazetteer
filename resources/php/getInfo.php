@@ -21,7 +21,7 @@
     };
     
     // Get slug
-	$str = file_get_contents('countries.json');
+	$str = file_get_contents('../json/countries.json');
 	$decode = json_decode($str,true);
 	$countries = $decode['countries'];
 	foreach ($countries as $features){
@@ -31,7 +31,7 @@
 	};
 
 	// Get features information from json file
-    $str = file_get_contents('countryBorders.json');
+    $str = file_get_contents('../json/countryBorders.json');
 	$decode = json_decode($str,true);
 	$countries =$decode['features'];
 	foreach ($countries as $features){
@@ -96,7 +96,11 @@ if (count($feature['geometry']['coordinates']) > 1){
 	$result=curl_exec($ch);
 	curl_close($ch);
 
-	$restcountry = json_decode($result,true);
+    $restcountry = json_decode($result,true);
+    
+    $wikiCapital = explode(" ",$restcountry['capital']);
+    $wikiCapital = implode("-",$wikiCapital);
+
 
 
 
@@ -109,6 +113,9 @@ if (count($feature['geometry']['coordinates']) > 1){
     $ch7 = curl_init();
     $ch8 = curl_init();
     $ch9 = curl_init();
+    $ch10 = curl_init();
+    
+   
 
     // set url and options
     curl_setopt($ch2, CURLOPT_SSL_VERIFYPEER, false);
@@ -116,7 +123,7 @@ if (count($feature['geometry']['coordinates']) > 1){
     curl_setopt($ch2, CURLOPT_URL,'http://api.geonames.org/countryInfoJSON?formatted=true&country=' . $code . '&username=nrproudfoot&style=full');
     curl_setopt($ch3, CURLOPT_SSL_VERIFYPEER, false);
 	curl_setopt($ch3, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch3, CURLOPT_URL,'https://api.openweathermap.org/data/2.5/weather?q=' . $restcountry['capital'] . ',' . $code . '&appid=' . $openWeatherId);
+    curl_setopt($ch3, CURLOPT_URL,'https://api.openweathermap.org/data/2.5/weather?q=' . $restcountry['capital'] . ',' . $code . '&units=metric&appid=' . $openWeatherId);
     curl_setopt($ch4, CURLOPT_SSL_VERIFYPEER, false);
 	curl_setopt($ch4, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch4, CURLOPT_URL,'https://api.foursquare.com/v2/venues/explore?near=' . $slug . '&categoryId=4deefb944765f83613cdba6e&limit=15&sortByPopularity=1&client_id=' . $foursquareId . '&client_secret=' . $foursquareSecret . '&v=20210101');
@@ -135,7 +142,10 @@ if (count($feature['geometry']['coordinates']) > 1){
     curl_setopt($ch9, CURLOPT_SSL_VERIFYPEER, false);
 	curl_setopt($ch9, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch9, CURLOPT_URL,"https://api.covid19api.com/total/country/" . $code);
-
+    curl_setopt($ch10, CURLOPT_SSL_VERIFYPEER, false);
+	curl_setopt($ch10, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch10, CURLOPT_URL,"http://api.geonames.org/wikipediaSearch?q=" . $wikiCapital . "&maxRows=1&type=json&username=nrproudfoot");
+    
     // Create multi handle
     $mh = curl_multi_init();
 
@@ -148,6 +158,9 @@ if (count($feature['geometry']['coordinates']) > 1){
     curl_multi_add_handle($mh,$ch7);
     curl_multi_add_handle($mh,$ch8);
     curl_multi_add_handle($mh,$ch9);
+    curl_multi_add_handle($mh,$ch10);
+   
+
 
     //execute the multi handle
     do {
@@ -166,6 +179,8 @@ curl_multi_remove_handle($mh, $ch6);
 curl_multi_remove_handle($mh, $ch7);
 curl_multi_remove_handle($mh, $ch8);
 curl_multi_remove_handle($mh, $ch9);
+curl_multi_remove_handle($mh, $ch10);
+
 curl_multi_close($mh);
 
 
@@ -183,6 +198,7 @@ $bars = json_decode(curl_multi_getcontent($ch7),true);
 $bars = $bars['response']['groups'][0]['items'];
 $eq = json_decode(curl_multi_getcontent($ch8),true);
 $covid = json_decode(curl_multi_getcontent($ch9),true);
+$capitalWiki = json_decode(curl_multi_getcontent($ch10),true);
 $index = array_key_last($covid);
 	$latestData = [
 		"confirmed" => $covid[$index]['Confirmed'],
@@ -192,6 +208,8 @@ $index = array_key_last($covid);
 		"dailyavg" => ($covid[$index]['Confirmed'] - $covid[$index-7]['Confirmed']) / 7,
 		"dailydeaths" => ($covid[$index]['Deaths'] - $covid[$index-7]['Deaths']) / 7,
     ];
+    $capitalWiki = $capitalWiki['geonames'][0];
+    
 
 // Format foursquare
 $foursquareVenues = array();
@@ -268,6 +286,9 @@ $countryInfo = [
     "slug" => $slug,
     "code" => $code,
     "earthquakes" => $eq,
+    "wikipedia" => [
+                    "capital" => $capitalWiki,
+    ]
 ];
 
 

@@ -1,4 +1,4 @@
-// Initialise options object
+// Define options class
 
 class Options {
     constructor(){
@@ -7,9 +7,17 @@ class Options {
         this.earthquakes = true;
         this.food = true;
         this.bars = true;
+        this.weather = true;
         this.sort = "country";
         this.location = null;
         this.clickLocation;
+    }
+    setWeather(){
+        if(this.weather === true){
+            this.weather = false;
+        } else {
+            this.weather = true;
+        }
     }
     setHistory(){
         if (this.history === true){
@@ -53,78 +61,47 @@ class Options {
             alert("There was an error");
         } 
     }
-    setLocation(location){
-            this.location = location;
-    }
-    getLocation(){
-        return this.location;
-    }
-    setClickLocation(location){
-        this.clickLocation = location;
-    }
-    getClickLocation(){
-        return this.clickLocation;
-    }
-    getClickLat(){
-        return this.clickLocation[0];
-    }
-    getClickLng(){
-        return this.clickLocation[1];
-    }
-    getLat(){
-        return this.location[0];
-    }
-    getLng(){
-        return this.location[1];
-    }
-    getHistory(){
-        return this.history;
-    }
-    getParks(){
-        return this.parks;
-    }
-    getEarthquakes(){
-        return this.earthquakes;
-    }
-    getFood(){
-        return this.food;
-    }
-    getBars(){
-        return this.bars;
-    }
-    getSort(){
-        return this.sort
-    }
+    setLocation(location){this.location = location;}
+    getLocation(){return this.location;}
+    setClickLocation(location){this.clickLocation = location;}
+    getClickLocation(){return this.clickLocation;}
+    getClickLat(){return this.clickLocation[0];}
+    getClickLng(){return this.clickLocation[1];}
+    getWeather(){return this.weather;}
+    getLat(){return this.location[0];}
+    getLng(){return this.location[1];}
+    getHistory(){return this.history;}
+    getParks(){return this.parks;}
+    getEarthquakes(){return this.earthquakes;}
+    getFood(){return this.food;}
+    getBars(){return this.bars;}
+    getSort(){return this.sort}
 };
+
+// Define data class
+
 class Data {
     constructor(){
         this.info;
+        this.prevInfo;
         this.localInfo = null;
         this.bounds;
     }
-    setCountryInfo(data){
-        this.info = data
-        }  
-    setLocalInfo(data){
-        this.localInfo = data
-    }
-    getCountryInfo(){
-        return this.info;
-    }
-    getLocalInfo(){
-        return this.localInfo;
-    }
-    setBoundary(bounds){
-        this.bounds = bounds;
-    }
-    getBoundary(){
-        return this.bounds;
-    }
+    setCountryInfo(data){this.info = data}  
+    setLocalInfo(data){this.localInfo = data}
+    setPrevInfo(data){this.prevInfo = data}
+    getPrevInfo(){return this.prevInfo}
+    getCountryInfo(){return this.info;}
+    getLocalInfo(){return this.localInfo;}
+    setBoundary(bounds){this.bounds = bounds;}
+    getBoundary(){return this.bounds;}
 }
 
+// Initialise global options object
 let mapOpts = new Options();
+
+// Initialise global data object
 let data = new Data();
-var circle;
 
 // Initialise map as global var
 var map = new L.Map("mapid", {
@@ -142,97 +119,101 @@ var Stadia_AlidadeSmooth = L.tileLayer('https://tiles.stadiamaps.com/tiles/alida
 });
 Stadia_AlidadeSmooth.addTo(map);
 var boundaryLayer;
+// Init capital marker
 var capitalIcon = L.icon({
-        iconUrl: 'purplepin.png',
-        shadowUrl: 'pinshadow.png',
+        iconUrl: '/SpinGlobe/resources/images/capitalpin.png',
+        shadowUrl: '/SpinGlobe/resources/images/capitalshadow.png',
     
-        iconSize:     [23, 50], // size of the icon
-        shadowSize:   [25, 32], // size of the shadow
-        iconAnchor:   [11.5, 50], // point of the icon which will correspond to marker's location
-        shadowAnchor: [0, 32],  // the same for the shadow
+        iconSize:     [60, 70], // size of the icon
+        shadowSize:   [60, 60], // size of the shadow
+        iconAnchor:   [30, 70], // point of the icon which will correspond to marker's location
+        shadowAnchor: [15, 70],  // the same for the shadow
         popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
     });
-// Init capital marker
-var capitalMarker = L.marker([0,50], {icon: capitalIcon, zIndexOffset: 100});
+var capitalMarker = L.marker([0,50], {icon: capitalIcon});
+
 // Init YOU marker
 var youIcon = L.icon({
-    iconUrl: 'youpin.png',
-    shadowUrl: 'youshadow.png',
+    iconUrl: '/SpinGlobe/resources/images/youpin.png',
+    shadowUrl: '/SpinGlobe/resources/images/youshadow.png',
 
     iconSize:     [60, 68], // size of the icon
-    shadowSize:   [75, 55], // size of the shadow
-    iconAnchor:   [30,68], // point of the icon which will correspond to marker's location
-    shadowAnchor: [0, 50],  // the same for the shadow
+    shadowSize:   [80, 68], // size of the shadow
+    iconAnchor:   [30, 68], // point of the icon which will correspond to marker's location
+    shadowAnchor: [7, 66],  // the same for the shadow
     popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
 });
-var youMarker = L.marker([0,50], {icon: youIcon, zIndexOffset: 100});
+var youMarker = L.marker([0,50], {icon: youIcon});
+
 // Init history marker
 var sightsIcon = L.icon({
-    iconUrl: 'historypin.png',
-    shadowUrl: 'pinshadow.png',
+    iconUrl: '/SpinGlobe/resources/images/historypin.png',
+    shadowUrl: '/SpinGlobe/resources/images/historyshadow.png', 
 
-    iconSize:     [17, 38], // size of the icon
-    shadowSize:   [22, 27], // size of the shadow
-    iconAnchor:   [8, 38], // point of the icon which will correspond to marker's location
-    shadowAnchor: [0, 27],  // the same for the shadow
+    iconSize:     [22, 38], // size of the icon
+    shadowSize:   [30, 27], // size of the shadow
+    iconAnchor:   [11, 38], // point of the icon which will correspond to marker's location
+    shadowAnchor: [3, 27],  // the same for the shadow
     popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
 });
 var sightsGroup;
 //Init parks marker
 var parksIcon = L.icon({
-    iconUrl: 'parkspin.png',
-    shadowUrl: 'pinshadow.png',
+    iconUrl: '/SpinGlobe/resources/images/parkspin.png',
+    shadowUrl: '/SpinGlobe/resources/images/parksshadow.png',
 
-    iconSize:     [17, 38], // size of the icon
-    shadowSize:   [22, 27], // size of the shadow
-    iconAnchor:   [8, 38], // point of the icon which will correspond to marker's location
+    iconSize:     [25, 38], // size of the icon
+    shadowSize:   [42, 27], // size of the shadow
+    iconAnchor:   [12, 38], // point of the icon which will correspond to marker's location
     shadowAnchor: [0, 27],  // the same for the shadow
     popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
 });
 var parksGroup;
 // Init food marker
 var foodIcon = L.icon({
-    iconUrl: 'yellowpin.png',
-    shadowUrl: 'pinshadow.png',
+    iconUrl: '/SpinGlobe/resources/images/foodpin.png',
+    shadowUrl: '/SpinGlobe/resources/images/foodshadow.png',
 
-    iconSize:     [17, 38], // size of the icon
-    shadowSize:   [22, 27], // size of the shadow
-    iconAnchor:   [8, 38], // point of the icon which will correspond to marker's location
-    shadowAnchor: [0, 27],  // the same for the shadow
+    iconSize:     [25, 38], // size of the icon
+    shadowSize:   [30, 27], // size of the shadow
+    iconAnchor:   [15, 38], // point of the icon which will correspond to marker's location
+    shadowAnchor: [3, 27],  // the same for the shadow
     popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
 });
 var foodGroup;
 // Init bars marker
 var barsIcon = L.icon({
-    iconUrl: 'barsicon.png',
-    shadowUrl: 'pinshadow.png',
+    iconUrl: '/SpinGlobe/resources/images/barsicon.png',
+    shadowUrl: '/SpinGlobe/resources/images/barsshadow.png',
 
-    iconSize:     [17, 38], // size of the icon
-    shadowSize:   [22, 27], // size of the shadow
-    iconAnchor:   [8, 38], // point of the icon which will correspond to marker's location
-    shadowAnchor: [0, 27],  // the same for the shadow
+    iconSize:     [22, 38], // size of the icon
+    shadowSize:   [30, 27], // size of the shadow
+    iconAnchor:   [11, 38], // point of the icon which will correspond to marker's location
+    shadowAnchor: [3, 22],  // the same for the shadow
     popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
 });
 var barsGroup;
 // Init earthquake marker
 var eqIcon = L.icon({
-    iconUrl: 'eqpin.png',
-    shadowUrl: 'pinshadow.png',
+    iconUrl: '/SpinGlobe/resources/images/eqpin.png',
+    shadowUrl: '/SpinGlobe/resources/images/eqshadow.png',
 
-    iconSize:     [17, 38], // size of the icon
-    shadowSize:   [22, 27], // size of the shadow
-    iconAnchor:   [8, 38], // point of the icon which will correspond to marker's location
-    shadowAnchor: [0, 27],  // the same for the shadow
+    iconSize:     [18, 38], // size of the icon
+    shadowSize:   [32, 27], // size of the shadow
+    iconAnchor:   [9, 38], // point of the icon which will correspond to marker's location
+    shadowAnchor: [5, 27],  // the same for the shadow
     popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
 });
 var eqGroup;
+// Init local radius
+var circle;
 
 // Helper functions
 
 // Create options
 function createOptions(){
     $.ajax({
-		url: "getCountries.php",
+		url: "/SpinGlobe/resources/php/getCountries.php",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result){
@@ -257,10 +238,16 @@ function createOptions(){
 }
 function getInfo(code, options){
     /* Get information about given country from getInfo.php */
+    if (code){
+        $("#loadingText").html("There was a problem finding your location, too bad!");
+    }
+    if(data.getCountryInfo()){
+        data.setPrevInfo(data.getCountryInfo());
+    }
     if(code){  // If country code provided
         code = code.trim();
         $.ajax({
-		    url: "getInfo.php",
+		    url: "/SpinGlobe/resources/php/getInfo.php",
 		    type: 'GET',
             dataType: 'json',
             data: {
@@ -269,7 +256,7 @@ function getInfo(code, options){
             success: function(result){
                 console.log("Success: Recieved API response from getInfo.php");
                 data.setCountryInfo(result.data);
-                console.log(result.data);
+                console.log(result.status);
                 addModalInfo(data.getCountryInfo());
                 addBasicLayers(data.getCountryInfo(), options);
                 if (options.sort == "country"){
@@ -282,7 +269,7 @@ function getInfo(code, options){
         });
     } else if (options.getClickLocation()) { // Else if map has been clicked
         $.ajax({
-		    url: "getInfo.php",
+		    url: "/SpinGlobe/resources/php/getInfo.php",
 		    type: 'GET',
             dataType: 'json',
             data: {
@@ -292,7 +279,36 @@ function getInfo(code, options){
             },
             success: function(result){
                 console.log("Success: Recieved API response from getInfo.php");
-                console.log(result.data);
+                console.log(result.status);
+                options.setClickLocation(null);
+                data.setPrevInfo(data.getCountryInfo());
+                data.setCountryInfo(result.data);
+                // If clicked country is different from current country
+                if (data.getCountryInfo().code != data.getPrevInfo().code){
+                    console.log(result.status);
+                    mapOpts.setSort("country");
+                    addModalInfo(data.getCountryInfo());
+                    addBasicLayers(data.getCountryInfo(), options);
+                    addInterestLayers(data.getCountryInfo(), options);
+                    $("#where2").prop("checked",true);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log("Failure: Error getting API response from getInfo.php");
+            }
+        });
+    } else { // Else no code or map click
+        $.ajax({
+		    url: "/SpinGlobe/resources/php/getInfo.php",
+		    type: 'GET',
+            dataType: 'json',
+            data: {
+                code: null,
+                lat: options.getLat(),
+                lng: options.getLng(),
+            },
+            success: function(result){
+                console.log("Success: Recieved API response from getInfo.php");
                 options.setClickLocation(null);
                 data.setCountryInfo(result.data);
                 console.log(result.status);
@@ -306,35 +322,10 @@ function getInfo(code, options){
                 console.log("Failure: Error getting API response from getInfo.php");
             }
         });
-    } else { // Else no code or map click
-        $.ajax({
-		    url: "getInfo.php",
-		    type: 'GET',
-            dataType: 'json',
-            data: {
-                code: null,
-                lat: options.getLat(),
-                lng: options.getLng(),
-            },
-            success: function(result){
-                console.log("Success: Recieved API response from getInfo.php",result);
-                options.setClickLocation(null);
-                data.setCountryInfo(result.data);
-                console.log(result.data);
-                addModalInfo(data.getCountryInfo());
-                addBasicLayers(data.getCountryInfo(), options);
-                if (options.sort == "country"){
-                    addInterestLayers(data.getCountryInfo(), options);
-                }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.log("Failure: Error getting API response from getInfo.php");
-            }
-        });
     };
     if (!data.getLocalInfo()){
         $.ajax({
-		    url: "getLocalInfo.php",
+		    url: "/SpinGlobe/resources/php/getLocalInfo.php",
 		    type: 'GET',
             dataType: 'json',
             data: {
@@ -396,7 +387,7 @@ function addInterestLayers(country, options){
     }
     let sights = [];
     country.foursquare.forEach(sight => { 
-        sight = L.marker([sight.lat,sight.lng], {icon: sightsIcon}).bindTooltip("<div style='text-align:center'}><h5>" + sight.name + "</h5><p>"+ sight.category + "</p><img src=" + sight.icon + "><br><div style='text-align: center'>" + sight.address.join(",<br>") + "</div></div>");
+        sight = L.marker([sight.lat,sight.lng], {icon: sightsIcon}).bindTooltip("<div style='text-align:center'}><h5 class='tooltipText'>" + sight.name + "</h5><p class='tooltipText'>"+ sight.category + "</p><img src=" + sight.icon + "><br><div style='text-align: center' class='tooltipText'>" + sight.address.join(",<br>") + "</div></div>");
         sights.push(sight);
     });
     sightsGroup = L.layerGroup(sights);
@@ -409,7 +400,7 @@ function addInterestLayers(country, options){
     }
     let parks = [];
     country.parks.forEach(park => { 
-        park = L.marker([park.lat,park.lng], {icon: parksIcon}).bindTooltip("<div style='text-align:center'}><h5>" + park.name + "</h5><p>"+ park.category + "</p><img src=" + park.icon + "><br><div style='text-align: center'>" + park.address.join(",<br>") + "</div></div>");
+        park = L.marker([park.lat,park.lng], {icon: parksIcon}).bindTooltip("<div style='text-align:center'}><h5 class='tooltipText'>" + park.name + "</h5><p class='tooltipText'>"+ park.category + "</p><img src=" + park.icon + "><br><div style='text-align: center' class='tooltipText'>" + park.address.join(",<br>") + "</div></div>");
         parks.push(park);
     });
     parksGroup = L.layerGroup(parks);
@@ -422,7 +413,7 @@ function addInterestLayers(country, options){
     }
     let food = [];
     country.food.forEach(sight => { 
-        sight = L.marker([sight.lat,sight.lng], {icon: foodIcon}).bindTooltip("<div style='text-align:center'}><h5>" + sight.name + "</h5><p>"+ sight.category + "</p><img src=" + sight.icon + "><br><div style='text-align: center'>" + sight.address.join(",<br>") + "</div></div>");
+        sight = L.marker([sight.lat,sight.lng], {icon: foodIcon}).bindTooltip("<div style='text-align:center'}><h5 class='tooltipText'>" + sight.name + "</h5><p class='tooltipText'>"+ sight.category + "</p><img src=" + sight.icon + "><br><div style='text-align: center' class='tooltipText'>" + sight.address.join(",<br>") + "</div></div>");
         food.push(sight);
     });
     foodGroup = L.layerGroup(food);
@@ -436,7 +427,7 @@ function addInterestLayers(country, options){
     }
     let bars = [];
     country.bars.forEach(sight => { 
-        sight = L.marker([sight.lat,sight.lng], {icon: barsIcon}).bindTooltip("<div style='text-align:center'}><h5>" + sight.name + "</h5><p>"+ sight.category + "</p><img src=" + sight.icon + "><br><div style='text-align: center'>" + sight.address.join(",<br>") + "</div></div>");
+        sight = L.marker([sight.lat,sight.lng], {icon: barsIcon}).bindTooltip("<div style='text-align:center'}><h5 class='tooltipText'>" + sight.name + "</h5><p class='tooltipText'>"+ sight.category + "</p><img src=" + sight.icon + "><br><div style='text-align: center' class='tooltipText'>" + sight.address.join(",<br>") + "</div></div>");
         bars.push(sight);
     });
     barsGroup = L.layerGroup(bars);
@@ -450,13 +441,24 @@ function addInterestLayers(country, options){
     let eq = [];
     let earthquakes = country.earthquakes.earthquakes;
     earthquakes.forEach(sight => { 
-        sight = L.marker([sight.lat,sight.lng], {icon: eqIcon}).bindTooltip("<table style='text-align:left'><tr><th colspan=2 style='text-align:center'>Earthquake<th></tr><tr><th>Date</th><td>" + sight.datetime + "</td></tr><tr><th>Magnitude</th><td>" + sight.magnitude + "</td></tr><tr><th>Depth</th><td>" + sight.depth + "</td></tr></table></div>");
+        sight = L.marker([sight.lat,sight.lng], {icon: eqIcon}).bindTooltip("<table style='text-align:left'><tr><th colspan=2 style='text-align:center' class='tooltipText'>Earthquake<th></tr><tr><th class='tooltipText'>Date</th><td style='padding-left:5px' class='tooltipText'>" + sight.datetime + "</td></tr><tr><th class='tooltipText'>Magnitude</th><td style='padding-left:5px' class='tooltipText'>" + sight.magnitude + "</td></tr><tr><th class='tooltipText'>Depth</th><td style='padding-left:5px' class='tooltipText' >" + sight.depth + "</td></tr></table></div>");
         eq.push(sight);
     });
     eqGroup = L.layerGroup(eq);
     if(options.getEarthquakes() == true){     
         eqGroup.addTo(map);
     }
+    // Create weather div
+    $("#weatherName").html(country.weather.name + " " + country.weather.sys.country);
+    $("#weatherIcon").prop('src','https://openweathermap.org/img/wn/' + country.weather.weather[0].icon + '@2x.png');
+    $("#weatherTemp").html(Math.round(country.weather.main.temp) + "&deg;C");
+    $("#weatherDesc").html(country.weather.weather[0].description);
+    $("#weatherPress").html(country.weather.main.pressure + " hPa");
+    $("#weatherHumid").html(country.weather.main.humidity + " %");
+    if(options.getWeather() == true){     
+        $("#weather").show();
+    }
+    
 }
 function addBasicLayers(country, options){
     // Create you marker
@@ -467,8 +469,7 @@ function addBasicLayers(country, options){
     // Create capital city marker
     var capLatLng = new L.LatLng(country.weather.coord.lat,country.weather.coord.lon);
     capitalMarker.setLatLng(capLatLng).addTo(map);
-    capitalMarker.bindTooltip("<p><strong>Capital City: </strong><br>" + country.capital + "</p>");
-
+    capitalMarker.bindPopup("<div class='container'><div class='row'><div class='col-12'><h4 class='tooltipText'>" + country.capital + "</h4></div></div><div class='row'><div class='col-12'><p class='tooltipText'>Capital City</p></div></div><div class='row'><div class='col-12'><p class='tooltipText'>" + country.wikipedia.capital.summary + "</p></div></div><div class'row'><div class='col-12'><a class='tooltipText' target='blank' href='https://" + country.wikipedia.capital.wikipediaUrl + "'>More on Wikipedia</a></div></div></div>");
     // Add boundary border to map
     // Reverse coordinates for creating bounds
     country = country.features;
@@ -515,8 +516,9 @@ function addBasicLayers(country, options){
         map.removeLayer(boundaryLayer);
     }
     boundaryLayer = L.geoJSON(currentCountry, {
-    style: {color: "#33CC33"}
+    style: {color: "rgb(168,224,112)"}
     }).addTo(map); 
+    $(".se-pre-con").fadeOut("slow");
     document.getElementById('selectCountry').value=country.properties.iso_a2;
 }
 
@@ -524,11 +526,13 @@ function addBasicLayers(country, options){
 
  function getLocation() {
     var x = $("#demo");
+    $("#loadingText").html("Just getting your location...");
      if (navigator.geolocation) {
          navigator.geolocation.getCurrentPosition((position)=> {
+            $("#loadingText").html("Got it! Populating map...");
             console.log("Success: Retrieved location");
             mapOpts.setLocation([position.coords.latitude,position.coords.longitude]);
-            getInfo(null,mapOpts)
+            getInfo(null,mapOpts);
          }),
           ()=>{
              console.log("Error finding location");
@@ -537,17 +541,20 @@ function addBasicLayers(country, options){
  };
 };
  
-     
-
-
 $(window).on('load', function (){
-   createOptions();
-   getLocation();
-   setTimeout(function(){
-    if (!mapOpts.getLocation()){
-        getInfo("GB",mapOpts);
+    $("#loadingText").html("Welcome to SpinGlobe!");
+    $("#weather").hide();
+    createOptions();
+    getLocation();
+    setTimeout(()=>{
+    if (mapOpts.getLocation() == null){
+        $("#loadingText").html("Still working on it!");
+        setTimeout(()=>{
+            if (mapOpts.getLocation() == null){
+                getInfo("GB",mapOpts);
+        }},3000);   
     }
-}, 1000);
+}, 4500);
    
 
 })
@@ -555,17 +562,16 @@ $(window).on('load', function (){
 $("#selectCountry").on('change', function(e){
     let country = $("#selectCountry");
     mapOpts.setSort("country");
+    $("#where2").prop("checked",true);
     getInfo(country.val(), mapOpts);
 })
 $("#collapseOne").on('click', function(e){
-    console.log(e.target);
     $('#collapseOne').attr('open',true);
     
 
 })
 
 map.on('click', function(e){
-    console.log(e);
     mapOpts.setClickLocation([e.latlng.lat,e.latlng.lng]);
     getInfo(null, mapOpts);
 })
@@ -595,6 +601,14 @@ $("#earthquakes").on("change",function(e){
     } else {
         map.removeLayer(eqGroup);
     };
+})
+$("#weatherOpt").on("change",function(e){
+    mapOpts.setWeather();
+    if(mapOpts.getWeather()){
+        $("#weather").show();
+    } else {
+        $("#weather").hide();
+    }
 })
 $('#restaurants').on("change",function(e){
     mapOpts.setFood();
@@ -630,5 +644,4 @@ $('#where').on('change',function(e){
         map.fitBounds(data.getBoundary());
         addInterestLayers(data.getCountryInfo(),mapOpts);
     };
-    console.log(mapOpts.getSort());
 })
