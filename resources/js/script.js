@@ -613,7 +613,8 @@ function createOptions(){
             }
         },
 		error: function(jqXHR, textStatus, errorThrown) {
-			console.log("Failure: Error retrieving countries array from getCountries.php")
+            console.log("Error: Problem retrieving countries data from server, retrying");
+            createOptions();
 }
 })
 }
@@ -635,7 +636,6 @@ function getInfo(code, options){
                 code: code,
             },
             success: function(result){
-                console.log(result.data);
                 data.setCountryInfo(result.data);
                 addModalInfo(data.getCountryInfo());
                 addBasicLayers(data.getCountryInfo(), options);
@@ -644,7 +644,7 @@ function getInfo(code, options){
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
-
+                console.log("Error: Not getting API response, retrying");
                 getInfo(code,mapOpts);
             }
         });
@@ -673,13 +673,14 @@ function getInfo(code, options){
                 }
             }},
             error: function(jqXHR, textStatus, errorThrown) {
-                console.log("Failure: Error getting API response from getInfo.php");
+                $("#loadingText").html("Sorry, taking longer than usual!");
+                console.log("Error: No API response, retrying");
+                getInfo(code=null,options);
             }
         });
     } else { 
         // Else no code or map click
         $("#loadingText").html("Got it! Populating map...");
-        console.log("About to call API with lat and lon " +  options.getLat() + "," + options.getLng());
         $.ajax({
 		    url: "/Gazetteer/resources/php/getInfo.php",
 		    type: 'GET',
@@ -690,8 +691,6 @@ function getInfo(code, options){
                 lng: options.getLng(),
             },
             success: function(result){
-                console.log("Recieved API response");
-                console.log(result.data);
                 options.setClickLocation(null);
                 data.setCountryInfo(result.data);
                 addModalInfo(data.getCountryInfo());
@@ -702,7 +701,7 @@ function getInfo(code, options){
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 $("#loadingText").html("Sorry, taking longer than usual!");
-                getInfo(code,mapOpts);
+                getInfo(code=null,mapOpts);
             }
         });
     };
@@ -722,8 +721,8 @@ function getInfo(code, options){
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                alert("I'm broken");
-                console.log("Failure: Error getting API response from getLocalInfo.php");
+                
+                console.log("Error: no API response for local info");
             }
             });
     }
@@ -738,7 +737,6 @@ function addLocalRadius(options){
     circle = L.circle([options.getLat(),options.getLng()], {radius: 15000,color: "rgb(57,251,215)", fillColor:"rgb(57,251,215)", fillOpacity: 0.2}).addTo(map);
 }
 function addModalInfo(country){
-    console.log("Starting modals");
     // Format population string
     let population;
     if (country.population >= 1000000000){
@@ -837,7 +835,6 @@ function addModalInfo(country){
         $('#other').attr("style","{display:none}");
     }
     if (country.currencies[0].code == "GBP"){
-        console.log("Sure is");
         $("#exch1").html("Euro");
         $("#exch2").html("US Dollar");
         $("#exch3").html("");
@@ -906,8 +903,6 @@ function addModalInfo(country){
         };
     
 
-    console.log("starting news modal");
-    console.log(country);
     let headlines = [$("#headline1"),$("#headline2"),$("#headline3"),$("#headline4"),$("#headline5")];
     let images = [$('#image1'),$('#image2'),$('#image3'),$('#image4'),$('#image5')];
     let sources =[$("#source1"),$("#source2"),$("#source3"),$("#source4"),$("#source5")];
@@ -1011,7 +1006,7 @@ function addModalInfo(country){
         urlnames[i].html("News API");
     }
 };
-console.log("finished news, starting covid");
+
     // Create covid graph
     let covidDates = [];
     country.dailyCovid.date.forEach(entry =>{
@@ -1026,11 +1021,9 @@ console.log("finished news, starting covid");
     covidChart2.data.labels = covidDates;
     covidChart.update();
     covidChart2.update();
-    console.log("finished modals");
+   
 }
 function addInterestLayers(country, options){
-    console.log("starting interest layers with");
-    console.log(country);
     let icons = {};
     if (options.getTheme() == "dark"){
         icons.sights = sightsDarkIcon;
@@ -1138,15 +1131,11 @@ function addInterestLayers(country, options){
     myChart.update();
     myChart2.data.datasets[0].data = prec;
     myChart2.update(); 
-    $("#loadingText").html("Modals updated"); 
-    console.log("interest layers updated");  
     }
 
 function addBasicLayers(country, options){
-    console.log("starting basic layers");
     // Create you marker
     if (options.getLocation()){
-        console.log("with location");
         let latlng = new L.LatLng(options.getLat(),options.getLng());
         if (youMarker){
             map.removeLayer(youMarker);
@@ -1224,7 +1213,6 @@ function addBasicLayers(country, options){
     }).addTo(map); 
     $(".se-pre-con").fadeOut("slow");
     document.getElementById('selectCountry').value=country.properties.iso_a2;
-    console.log("finished basics");
 }
 
 // get user location
@@ -1433,13 +1421,9 @@ $("#theme").on('change',function(e){
 });
 $("#convertAmount").on("input",(e)=>{
     let unit = $("#currencyTo").val();
-    console.log("unit",unit);
     let poundrate = data.info.exchange.pound.rates[unit];
-    console.log("pound rate: ",poundrate);
     let poundamount = poundrate * e.target.value;
-    console.log("pound amount: ",poundamount);
     let amount = poundamount * data.info.exchange.pound.rates[data.info.currencies[0].code];
-    console.log("amount: ",amount);
     amount = Number.parseFloat(amount).toFixed(2);
     $("#convertedVal").html(amount);
     $("#convertedUnit").html(unit);
@@ -1447,13 +1431,9 @@ $("#convertAmount").on("input",(e)=>{
 $("#currencyTo").on("change",(e)=>{
     if($("#convertAmount").val()){
     let unit = $("#currencyTo").val();
-    console.log("unit",unit);
     let poundrate = data.info.exchange.pound.rates[unit];
-    console.log("pound rate: ",poundrate);
     let poundamount = poundrate * $("#convertAmount").val();
-    console.log("pound amount: ",poundamount);
     let amount = poundamount * data.info.exchange.pound.rates[data.info.currencies[0].code];
-    console.log("amount: ",amount);
     amount = Number.parseFloat(amount).toFixed(2);
     $("#convertedVal").html(amount);
     $("#convertedUnit").html(unit);
