@@ -9,6 +9,7 @@
         <script src="https://cdn.maptiler.com/mapbox-gl-js/v1.5.1/mapbox-gl.js"></script>
         <script type="application/javascript" src="resources/js/jquery-2.2.3.min.js"></script>
          <script src="https://cdn.maptiler.com/mapbox-gl-leaflet/latest/leaflet-mapbox-gl.js"></script>
+         <script src="resources/js/Chart.min.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.css" />
         <link rel="stylesheet" href="https://cdn.maptiler.com/mapbox-gl-js/v1.5.1/mapbox-gl.css" />
         <link rel="stylesheet" href="resources/css/style.css">
@@ -21,15 +22,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Arvo&family=Roboto:wght@100&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;500&display=swap" rel="stylesheet">
-    <title>SpinGlobe</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
+    <link rel="stylesheet" href="resources/css/style.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <title>Gazetteer</title>
 
     </head>
     <body>
+        <div id="fullscreenLoader"></div>
         <div class="container-fluid header" >
             <div class="row my-row">
                 
                     <div class="col-12 col-md-4 col-lg-4 col-xl-4 my-col">
-                        <h1 id="title">SpinGlobe</h1>
+                        <h1 id="title">Gazetteer</h1>
                     </div>
                     <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-4 my-col">
                         <p id="whereto">...where to?</p>
@@ -41,163 +50,414 @@
             </div>
                 </div>
             </div>
-            <div class="row button-row">
-                <div class="col-4 button-col">
-                    <button id="collapseOne" type="button" class="btn btn-secondary" data-toggle="modal" data-target="#detailsModal">
-                        Country Info
-                    </button>
-
-                </div>
-                <div class="col-4 button-col">
-                    <button id="collapseOne" type="button" class="btn btn-secondary" data-toggle="modal" data-target="#covidModal">
-                        Covid Stats
-                    </button>
-
-                </div>
-                <div class="col-4 button-col">
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          Options
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right">
-                            <form class="px-4 py-3">
-                              <div class="form-group">
-                                <label for="what">What do you want to see?</label>
-                                <div id="what" class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="1" id="history" checked>
-                                    <label class="form-check-label" for="defaultCheck1">
-                                      Historical locations
-                                    </label>
-                                    <br>
-                                    <input class="form-check-input" type="checkbox" value="1" id="parks" checked>
-                                    <label class="form-check-label" for="defaultCheck1">
-                                      National Parks
-                                    </label>
-                                    <br>
-                                    <input class="form-check-input" type="checkbox" value="1" id="earthquakes" checked>
-                                    <label class="form-check-label" for="defaultCheck1">
-                                      Earthquake Locations
-                                    </label>
-                                    <br>
-                                    <input class="form-check-input" type="checkbox" value="1" id="restaurants" checked>
-                                    <label class="form-check-label" for="defaultCheck1">
-                                      Popular restaurants
-                                    </label>
-                                    <br>
-                                    <input class="form-check-input" type="checkbox" value="1" id="bars" checked>
-                                    <label class="form-check-label" for="defaultCheck1">
-                                      Bars and pubs
-                                    </label>
-                                    <br>
-                                    <input class="form-check-input" type="checkbox" value="1" id="weatherOpt" checked>
-                                    <label class="form-check-label" for="defaultCheck1">
-                                      Weather
-                                    </label>
-                                    <br>
-                                  </div>
-                              </div>
-                              <label for="where">Where?</label>
-                              <div id="where" class="form-check">
-                                <input class="form-check-input" type="radio" name="where" id="where1" value="near">
-                                <label class="form-check-label" for="where1">
-                                  Near me
-                                </label>
-                                <br>
-                                <input class="form-check-input" type="radio" name="where" id="where2" value="country" checked>
-                                <label class="form-check-label" for="where2">
-                                  Selected Country
-                                </label>
-                              </div>
-                              <br>
-                            </form>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Like what you see? Hire me!</a>
-                        </div>
-                    </div>
-                </div>
+            <div class="row button-row break-bar">
             </div>
         </div>
         <div class= container-fluid id="mapArea">
                 <div class="mapbox-fluid" id="mapDiv">
                     <div class="se-pre-con">
                         <div id="loadingText" class="loadingText"></div>
-                    </div>
-                    <div class="container weather" id="weather">
-                        <div class=row>
-                            <div class="col-12">
-                                <h5 id="weatherName"></h5>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-6">
-                                <p id="weatherTemp"></p>
-                            </div>
-                            <div class="col-6">
-                                <img id="weatherIcon" alt="Weather Icon">
-                            </div>
-                        </div>
-                        <div class="row weatherExtras">
-                            <div class="col-12">
-                                <p id="weatherDesc"></p>
-                            </div>
-                        </div>
-                        <div class="row weatherExtras">
-                            <div class="col-6">
-                                <p>Pressure</p>
-                            </div>
-                            <div class="col-6">
-                                <p id="weatherPress"></p>
-                            </div>
-                        </div>
-                        <div class="row weatherExtras">
-                            <div class="col-6">
-                                <p>Humidity</p>
-                            </div>
-                            <div class="col-6">
-                                <p id="weatherHumid"></p>
-                            </div>
-                        </div>
-                
-                    </div>
-                
-            
-                   
-                        
-                        <!-- Button trigger modal -->
-                        
-  
+                    </div> 
                         <!-- Modal -->
+                        <div class="modal fade" id="weatherModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5  class="modal-title" id="exampleModalLabel">Weather</h5>
+                                        <button  type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="container weather" id="weather"> 
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <p>Current weather in <strong><span id="weatherName"></span>, <span id="weatherCode"></span></strong></h5>
+                                                </div>
+                                            </div>       
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <p id="weatherTemp"></p>
+                                                </div>
+                                                <div class="col-6">
+                                                    <img id="weatherIcon" alt="Weather Icon">
+                                                </div>
+                                            </div>
+                                            <div class="row weatherExtras">
+                                                <div class="col-12">
+                                                    <p id="weatherDesc"></p>
+                                                </div>
+                                            </div>
+                                            <div class="row weatherExtras">
+                                                <div class="col-6">
+                                                    <p class="bold">Pressure</p>
+                                                </div>
+                                                <div class="col-6">
+                                                    <p id="weatherPress"></p>
+                                                </div>
+                                            </div>
+                                            <div class="row weatherExtras">
+                                                <div class="col-6">
+                                                    <p class="bold">Humidity</p>
+                                                </div>
+                                                <div class="col-6">
+                                                    <p id="weatherHumid"></p>
+                                                </div>
+                                            </div>
+                                            <div class="dropdown-divider"></div>
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h5>Average temperature by month</h5>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <canvas id="myChart" width="100%" height="50px"></canvas>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h5>Average rainfall by month</h5>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <canvas id="myChart2" width="100%" height="50px"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    
+                                       
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal -->
+                        <!-- Modal -->
+                        <div class="modal fade" id="optionsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Options</h5>
+                                        <button  type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form class="px-4 py-3">
+                                            <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-7">
+                                              <label for="what">Pins</label>
+                                              <div id="what" class="form-check">
+                                                  <input class="form-check-input" type="checkbox" value="1" id="history" checked>
+                                                  <label class="form-check-label" for="history">
+                                                    Historical locations
+                                                  </label>
+                                                  <br>
+                                                  <input class="form-check-input" type="checkbox" value="1" id="parks" checked>
+                                                  <label class="form-check-label" for="parks">
+                                                    National Parks
+                                                  </label>
+                                                  <br>
+                                                  <input class="form-check-input" type="checkbox" value="1" id="earthquakes" checked>
+                                                  <label class="form-check-label" for="earthquakes">
+                                                    Earthquake locations
+                                                  </label>
+                                                  <br>
+                                                  <input class="form-check-input" type="checkbox" value="1" id="restaurants" checked>
+                                                  <label class="form-check-label" for="restaurants">
+                                                    Popular restaurants
+                                                  </label>
+                                                  <br>
+                                                  <input class="form-check-input" type="checkbox" value="1" id="bars" checked>
+                                                  <label class="form-check-label" for="bars">
+                                                    Bars and pubs
+                                                  </label>
+                                                  <br>
+                                                </div>
+                                                </div>
+                                                <div class="col-5">
+                                                    <label for="theme">Map theme</label>
+                                              <div id="theme" class="form-check">
+                                                  <input class="form-check-input" type="radio" name="theme" value="light" id="light" checked>
+                                                  <label class="form-check-label" for="light">
+                                                    Light
+                                                  </label>
+                                                  <br>
+                                                  <input class="form-check-input" type="radio" name="theme" value="dark" id="dark">
+                                                  <label class="form-check-label" for="dark">
+                                                    Dark
+                                                  </label>
+                                                  <br>
+                                                  <input class="form-check-input" type="radio" name="theme" value="satellite" id="satellite">
+                                                  <label class="form-check-label" for="satellite">
+                                                    Satellite
+                                                  </label>
+                                                  <br>
+                                                </div>
+
+                                            </div>
+                                            </div>
+
+                                            </div>
+                                            <label for="where">Where?</label>
+                                            <div id="where" class="form-check">
+                                              <input class="form-check-input" type="radio" name="where" id="where1" value="near">
+                                              <label class="form-check-label" for="where1">
+                                                Near me
+                                              </label>
+                                              <br>
+                                              <input class="form-check-input" type="radio" name="where" id="where2" value="country" checked>
+                                              <label class="form-check-label" for="where2">
+                                                Selected country
+                                              </label>
+                                            </div>
+                                            <br>
+                                          </form>
+                                          <div class="dropdown-divider"></div>
+                                          <a class="dropdown-item" href="#">Like what you see? Hire me!</a>
+                                     
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 id="name" class="modal-title" id="exampleModalLabel"></h5>
+                                    <h5 class="modal-title" id="exampleModalLabel">Information</h5>
                                     <button  type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    <table>
-                                        <tr>
-                                            <td colspan="2"><img width="100%" height="auto" id="flag"></td>
-                                            
-                                        </tr>
-                                        <tr>
-                                            <th>Capital:</th>
-                                            <td  id="capital"></td>
-                                        </tr>
-                                        <tr>
-                                            <th>Population:</th>
-                                            <td id="population"></td>
-                                        </tr>
-                                        <tr>
-                                            <th>Currency:</th>
-                                            <td id="currency"></td>
-                                        </tr>
-                                        
-                                    </table>
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <img width="100%" height="auto" id="flag">
+                                            </div>
+                                            <div class="col-6">
+                                                <h2 id="name"></h2>
+                                                <h4 id="continent"></h4>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <table class="table table-sm">
+                                                    <tr>
+                                                        <th scope="row">Population</th>
+                                                        <td id="population"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="row">Area</th>
+                                                        <td id="area"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="row">Languages</th>
+                                                        <td id="languages"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="row">Timezone</th>
+                                                        <td id="timezone"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="row">Dialling Code</th>
+                                                        <td id="diallingCode"></td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <br>
+                                                <h5>About</h5>
+                                                <p id="wikiCountry"></p>
+                                                <a id="wikiLink">More on Wikipedia</a>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal -->
+                    <div class="modal fade" id="newsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">News</h5>
+                                    <button  type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+                                        <div class="carousel-inner">
+                                          <div class="carousel-item active">
+                                            <div class="card news-card h-100" style="width:100%;">
+                                                <img class="card-img-top" id="image1" src="..." >
+                                                <div class="card-body">
+                                                  <h5 class="card-title headline" id="headline1">Card title</h5>
+                                                  <h6 class="card-subtitle mb-2 text-muted source" id="source1"></h6>
+                                                  <p class="card-text"><small class="text-muted date" id="date1" ></small></p>
+                                                  <p class="card-text description" id="description1"></p>
+                                                  <a href="#" class="card-link url" id="url1">Read more at <span id="urlname1"></span></a>
+                                                </div>
+                                              </div>
+                                          </div>
+                                          <div class="carousel-item">
+                                            <div class="card news-card h-100" style="width: 100%;">
+                                                <img class="card-img-top" id="image2" src="..." >
+                                                <div class="card-body">
+                                                  <h5 class="card-title headline" id="headline2">Card title</h5>
+                                                  <h6 class="card-subtitle mb-2 text-muted source" id="source2"></h6>
+                                                  <p class="card-text"><small class="text-muted date" id="date2" ></small></p>
+                                                  <p class="card-text description" id="description2"></p>
+                                                  <a href="#" class="card-link url" id="url2">Read more at <span id="urlname2"></span></a>
+                                                </div>
+                                            </div>
+                                          </div>
+                                          <div class="carousel-item">
+                                            <div class="card news-card h-100" style="width: 100%;">
+                                                <img class="card-img-top" id="image3" src="..." >
+                                                <div class="card-body">
+                                                  <h5 class="card-title headline" id="headline3">Card title</h5>
+                                                  <h6 class="card-subtitle mb-2 text-muted source" id="source3"></h6>
+                                                  <p class="card-text"><small class="text-muted date" id="date3" ></small></p>
+                                                  <p class="card-text description" id="description3"></p>
+                                                  <a href="#" class="card-link url" id="url3">Read more at <span id="urlname3"></span></a>
+                                                </div>
+                                              </div>
+                                          </div>
+                                          <div class="carousel-item">
+                                            <div class="card news-card h-100" style="width: 100%;">
+                                                <img class="card-img-top" id="image4" src="..." >
+                                                <div class="card-body">
+                                                  <h5 class="card-title headline" id="headline4">Card title</h5>
+                                                  <h6 class="card-subtitle mb-2 text-muted source" id="source4"></h6>
+                                                  <p class="card-text"><small class="text-muted date" id="date4" ></small></p>
+                                                  <p class="card-text description" id="description4"></p>
+                                                  <a href="#" class="card-link url" id="url4">Read more at <span id="urlname4"></span></a>
+                                                </div>
+                                              </div>
+                                          </div>
+                                          <div class="carousel-item">
+                                            <div class="card news-card h-100" style="width: 100%;">
+                                                <img class="card-img-top" id="image5" src="..." >
+                                                <div class="card-body">
+                                                  <h5 class="card-title headline" id="headline5">Card title</h5>
+                                                  <h6 class="card-subtitle mb-2 text-muted source" id="source5"></h6>
+                                                  <p class="card-text"><small class="text-muted date" id="date5" ></small></p>
+                                                  <p class="card-text description" id="description5"></p>
+                                                  <a href="#" class="card-link url" id="url5">Read more at <span id="urlname5"></span></a>
+                                                </div>
+                                              </div>
+                                         </div>
+                                        </div>
+                                          
+                                        
+                                        <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                                          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                          <span class="sr-only">Previous</span>
+                                        </a>
+                                        <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                                          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                          <span class="sr-only">Next</span>
+                                        </a>
+                                    </div>
+                                </div>
+                                 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="currencyModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5  class="modal-title" id="exampleModalLabel">Currency</h5>
+                                    <button  type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="container currency" id="currency"> 
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div id ="coin">
+                                                <h1 id="symbol"></h1>
+                                            </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <h2 id="currencyName"></h2>
+                                                
+                                                <p id="currencyCode"></p>
+                                            </div>
+                                        </div>       
+                                        <div class="row"  id="other">
+                                            <div class="col-12">
+                                                <h6>Other currencies</h6>
+                                                <p id="otherCurrencies"></p>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <h6 class="center">Current Exchange rates</h6>
+                                                <table class="table">
+                                                    <tr>
+                                                        <th scope="row" id="exch1"></th>
+                                                        <td id="rate1"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="row" id="exch2"></th>
+                                                        <td id="rate2"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="row" id="exch3"></th>
+                                                        <td id="rate3"></td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <h6 class="center">Currency converter</h6>
+                                            </div>
+                                        </div>
+                                        <div class="dropdown-divider"></div>
+                                        <div class="noConverter">
+                                            <p>Conversion unavailable for this currency.</p>
+                                        </div>
+                                            <div class="row converter">
+                                                <div class="col-6">
+                                                    <p>From <strong id="fromUnit"></strong></p>
+                                                </div>
+                                                <div class="col-6">
+                                                    <p>To</p>
+                                                    <select id="currencyTo"></select>
+                                                </div>
+                                            </div>
+                                            <br>
+                                            <div class="row converter">
+                                                <div class="col-7">
+                                                    <label for="convertAmount">Amount</label>
+                                                    <p id="fromSymbol"></p>
+                                                    <input id="convertAmount" type="text" width="50px">
+                                                </div>
+                                                <div class="col-5">
+                                                    <p id="convertedVal"></p>
+                                                    <p id="convertedUnit"><strong></strong></p>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                
+                                   
+                                
                             </div>
                         </div>
                     </div>
@@ -206,43 +466,66 @@
                         <div class="modal-dialog modal-dialog-centered" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 id="name2" class="modal-title" id="exampleModalLabel"></h5>
+                                    <h5 class="modal-title" id="exampleModalLabel">Covid 19</h5>
                                     <button  type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    <table>
+                                    <div class="imgContainer">
+                                        <div class="imgOverlay">
+                                            <h3 id="name2"></h3>
+                                        </div>
+                                    </div>
+                                    <table class="table table-sm">
                                         <tr>
-                                            <tr>
-                                                <td colspan="2"><img width="100%" height="auto" src="/SpinGlobe/resources/images/virus-4937553_1280.jpg"></td>
-                                                
-                                            </tr>
-                                            <th>Total Confirmed Cases:</th>
+                                            <th scope="row">Total Confirmed Cases:</th>
                                             <td  id="cases"></td>
                                         </tr>
                                         <tr>
-                                            <th>Total Deaths:</th>
+                                            <th scope="row">Total Deaths:</th>
                                             <td id="deaths"></td>
                                         </tr>
                                         <tr>
-                                            <th>Last 7 days Confirmed Cases:</th>
+                                            <th scope="row">Last 7 days Confirmed Cases:</th>
                                             <td id="7cases"></td>
                                         </tr>
                                         <tr>
-                                            <th>Last 7 days Deaths:</th>
+                                            <th scope="row">Last 7 days Deaths:</th>
                                             <td id="7deaths"></td>
                                         </tr>
                                         
                                     </table>
+                                    <div class="dropdown-divider"></div>
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h5>14 day trend (Deaths)</h5>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <canvas id="covidChart" width="100%" height="50px"></canvas>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h5>14 day trend (Cases)</h5>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <canvas id="covidChart2" width="100%" height="50px"></canvas>
+                                                </div>
+                                            </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="row-fluid some" id="mapid">
                     </div>
-                    </div>
-        </div>
+                </div>
+            </div>
+        
 
         <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
     integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
@@ -250,7 +533,7 @@
         </script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-
+        <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
        
         
         <script type="module" src="resources/js/script.js">

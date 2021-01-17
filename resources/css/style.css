@@ -1,9 +1,47 @@
 html,body{
     height: 100%;
+    background-color:  rgb(248, 248, 248);
+}
+#fullscreenLoader{
+    position: absolute;
+    width: 100%;
+    left: 0px;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+    z-index: 19999;
+    background-color:  rgb(248, 248, 248);
+    display: block;
+}
+.noConverter{
+	text-align: center;
+	display: none;
+}
+.converter{
+    text-align: center;
+}
+.converter p{
+	display: inline;
+}
+.converter select{
+	display: inline;
+	margin-left: 30px;
+}
+.converter strong{
+	margin-left: 10px;
+}
+#convertAmount{
+    width: 60px;
+    
+}
+#fromSymbol{
+	margin-left: 30px;
+	font-weight: bold;
 }
 .no-js #loader { display: none;  }
 .js #loader { display: block; position: absolute; left: 100px; top: 0; }
 .se-pre-con {
+    display: block;
 	position: absolute;
 	left: 0px;
 	top: 0px;
@@ -14,13 +52,54 @@ html,body{
     background-position: 50% 30%;
     background-repeat: no-repeat;
     background-color:  rgb(248, 248, 248);
-    display: block;
+    border: 3px solid #777777;
+    box-shadow: 4px 4px #444444;
+}
+.imgContainer{
+    width: 100%;
+    height: auto;
+    background-image: url("../images/virus-4937553_1280.jpg");
+}
+.imgOverlay{
+    margin: 0;
+    width: 80%;
+    color: white;
+    padding: 20px;
+}
+#coin{
+	height: 100px;
+	background-image: url("../images/coin.png");
+	background-repeat:no-repeat;
+	background-position: center;
+}
+.center{
+    text-align: center;
+}
+#symbol{
+	display:block;
+	text-align:center;
+	font-family: Arvo;
+	padding:21px;
+}
+#other{
+	display: none;
+}
+.leaflet-tooltip{
+	min-width:200px;
+    width: auto;
+    white-space: normal;
+}
+.leaflet-touch .leaflet-bar button {
+	line-height: 0.5;
+	margin: auto;
+    padding-right: 31px;
+    padding-top: 2px;
 }
 .loadingText {
     position: absolute;
     width: 100%;
     text-align: center;
-    top: 60%;
+    top: 70%;
     margin: 0 auto;
     color: black;
     background-color: transparent;
@@ -29,12 +108,27 @@ html,body{
     z-index: 3001;
 }
 
+.modal-header{
+	font-family: Arvo;
+	margin: 0 auto;
+	width: 100%
+
+}
+.modal-header h5{
+	margin: 0 auto;
+	width: 100%;
+	text-align: center;
+}
+#optionsModal{
+	opacity: 0.8;
+}
 #title {
     display:block;
     margin: 0 auto;
     font-family: Arvo, serif;
     padding-left: 20px;
     text-align: center;
+    text-shadow: 2px 2px #4444
 }
 body{
     background-color: rgb(240, 240, 240);
@@ -48,6 +142,23 @@ th{
     font-family: Roboto,sans-serif;
     font-weight: lighter;
     max-width: 300px;
+}
+h4.tooltipText{
+	font-weight: bold;
+	text-align:center;
+}
+h5.tooltipText, th.tooltipText{
+    font-weight: normal;
+}
+h5.tooltipText{
+    text-align: center;
+}
+#continent{
+    font-weight: lighter;
+}
+.carousel-control-prev,
+.carousel-control-next{
+      bottom: 60%;
 }
 .my-row {
     justify-content: stretch;
@@ -66,34 +177,27 @@ th{
 .mapbox-fluid {
     position: relative;
 }
-.weather {
-    position: absolute;
-    z-index: 3000;
-    bottom: 3px;
-    left: 3px;
-    width: 200px;
-    height: auto;
-    background: white;
-    opacity: 0.8;
-    border: 3px solid #666666;
-    box-shadow: 3px 3px #999999;
-}
 #weatherIcon{
-    width: 70px;
-    height: 70px;
+    width: 100px;
+    height: 100px;
 }
 #weatherTemp{
-    font-size: 3em;
+    font-size: 4em;
+    margin: 0 auto;
+    text-align: center;
+    
 }
 #weatherName{
     padding-top:3px;
 }
 #weatherDesc{
     text-transform: capitalize;
+    text-align: center;
 }
-.weatherExtras{
-	display: none;
+.bold{
+    font-weight: bold;
 }
+
 #info {
     background-color: rgb(180, 179, 179);
     color: white;
@@ -118,6 +222,8 @@ th{
 }
 #mapid {
     height: 100%;
+    border: 3px solid #777777;
+    box-shadow: 4px 4px #444444;
 }
 .dropdown-menu {
     width: auto;
@@ -128,26 +234,18 @@ th{
     height:auto;
 }
 
-#collapseOne, #dropdownMenu2 {
-    position: block;
-    background-color: #444444;
-    border-top: 3px solid #777777;
-    border-right: 0px;
-    border-left:0px;
-    border-bottom: 3px solid #777777;
-    border-radius:0px;
-    color: white;
-    width: 100%;
-    font-weight:lighter;
-    box-shadow: none;
-}
-
-#collapseOne:hover, #dropdownMenu2:hover {
-    text-decoration: underline;
-}
 @media screen and (min-height: 640px){
 	#mapArea{
     height: 78%;
+}
+.loadingText {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 60%;
+    margin: 0 auto;
+    color: black;
+    background-color: transparent;
 }
 }
 @media screen and (min-height: 731px){
@@ -166,10 +264,16 @@ th{
     height: 83%;
 }
 #title{
-	margin: 0 auto;
+    margin: 2px auto;
 }
 #whereto{
-	margin: 0 auto;
+    margin: 15px auto;
+}
+#selectCountry{
+    margin: 17px auto
+}
+.weatherExtras{
+    display: block;
 }
 }
 @media screen and (min-height: 960px){
@@ -178,6 +282,15 @@ th{
 }
     #title{
     	margin: 2px auto;
+    }
+    #whereto{
+        margin: 15px auto;
+    }
+    #selectCountry{
+        margin: 17px auto
+    }
+    .weatherExtras{
+        display: block;
     }
 }
 @media screen and (min-height: 1024px){
@@ -214,5 +327,29 @@ th{
  	display: block;
  }
 }
+@media screen and (min-width: 768px){
+    #title{
+       margin: 5px auto;
+   }
+#whereto{
+    margin: 15px auto;
+}
+#selectCountry{
+    margin: 17px auto
+}
+}
+@media screen and (max-height: 580px){
+    .loadingText {
+    	top: 80%;
+}
+@media screen and (max-height: 469px){
+    .loadingText {
+    	top: 90%;
+}
+@media screen and (max-height: 372px){
+    .loadingText {
+    	top: 95%;
+}
+
 
 
