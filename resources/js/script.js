@@ -919,6 +919,7 @@ function addModalInfo(country){
             }
         }
     });
+    console.log(news);
 
     
     
