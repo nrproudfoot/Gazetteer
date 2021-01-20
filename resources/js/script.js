@@ -862,8 +862,8 @@ function addModalInfo(country){
             $("#exch2").html("Euro");
             $("#exch3").html("US Dollar");
             $("#rate1").html(Number.parseFloat(1 / country.exchange.pound.rates[country.currencies[0].code]).toFixed(2));
-            $("#rate2").html(Number.parseFloat(country.exchange.euro.rates[country.currencies[0].code]).toFixed(2));
-            $("#rate3").html(Number.parseFloat(country.exchange.dollar.rates[country.currencies[0].code]).toFixed(2));
+            $("#rate2").html(Number.parseFloat(1 / country.exchange.euro.rates[country.currencies[0].code]).toFixed(2));
+            $("#rate3").html(Number.parseFloat(1 / country.exchange.dollar.rates[country.currencies[0].code]).toFixed(2));
         } else {
             $("#exch1").html("UK Pound");
             $("#exch2").html("Euro");
@@ -878,6 +878,9 @@ function addModalInfo(country){
     if (available.includes(country.currencies[0].code)){
             var select = document.getElementById("currencyTo"); 
             let currencyKeys = Object.keys(country.exchange.pound.rates);
+            currencyKeys = currencyKeys.sort(function(a,b){
+                return a.localeCompare(b);
+            });
             for(var i = 0; i < currencyKeys.length; i++) {
                 var el = document.createElement("option");
                 el.textContent = currencyKeys[i];
@@ -1422,9 +1425,9 @@ $("#theme").on('change',function(e){
 });
 $("#convertAmount").on("input",(e)=>{
     let unit = $("#currencyTo").val();
-    let poundrate = data.info.exchange.pound.rates[unit];
+    let poundrate = 1 / data.info.exchange.pound.rates[data.info.currencies[0].code];
     let poundamount = poundrate * e.target.value;
-    let amount = poundamount * data.info.exchange.pound.rates[data.info.currencies[0].code];
+    let amount = poundamount * data.info.exchange.pound.rates[unit];
     amount = Number.parseFloat(amount).toFixed(2);
     $("#convertedVal").html(amount);
     $("#convertedUnit").html(unit);
@@ -1432,9 +1435,10 @@ $("#convertAmount").on("input",(e)=>{
 $("#currencyTo").on("change",(e)=>{
     if($("#convertAmount").val()){
     let unit = $("#currencyTo").val();
-    let poundrate = data.info.exchange.pound.rates[unit];
+    let poundrate = 1 / data.info.exchange.pound.rates[data.info.currencies[0].code];
     let poundamount = poundrate * $("#convertAmount").val();
-    let amount = poundamount * data.info.exchange.pound.rates[data.info.currencies[0].code];
+    let amount = data.info.exchange.pound.rates[unit] * poundamount;
+    //let amount = poundamount * data.info.exchange.pound.rates[data.info.currencies[0].code];
     amount = Number.parseFloat(amount).toFixed(2);
     $("#convertedVal").html(amount);
     $("#convertedUnit").html(unit);
