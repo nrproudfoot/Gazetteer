@@ -1,8 +1,8 @@
 <?php
 	// API ids/keys/secrets
-	$openWeatherId = '4d38fe24ed24d11251cc0c8aead8b3cc'; 
-	$foursquareId = 'QISSDTUMJIE24U035OO4RLJKPUKCCZT3BJVXNYLJF0U2DQVR';
-	$foursquareSecret = 'ZJXFOYRVSOJABCIYEP4VU2BJJVNODPKAX5TIDNFGPOYRC1T2';
+	$openWeatherId = ''; 
+	$foursquareId = '';
+	$foursquareSecret = '';
 
     $executionStartTime = microtime(true);
     
