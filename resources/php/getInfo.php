@@ -3,11 +3,13 @@
 	$openWeatherId = ''; 
 	$foursquareId = '';
 	$foursquareSecret = '';
+	$username = ''
+	$newsApi='';
 
     $executionStartTime = microtime(true);
     
     if ($_REQUEST['code'] == null) {
-		$url='http://api.geonames.org/countryCode?&lat=' . $_REQUEST['lat'] . '&lng=' . $_REQUEST['lng'] . '&username=nrproudfoot';
+		$url='http://api.geonames.org/countryCode?&lat=' . $_REQUEST['lat'] . '&lng=' . $_REQUEST['lng'] . '&username=".$username;
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -96,9 +98,9 @@ $lat = round((($north + $south) / 2));
 
 $newscodes = ["AU","CA","GB","IE","NZ","US","ZA"];
 if (in_array($code, $newscodes)){
-    $newsurl = "https://newsapi.org/v2/top-headlines?country=" . $code . "&language=en&apiKey=f6a41d3092a94667a34fb5b92aada8bf";
+    $newsurl = "https://newsapi.org/v2/top-headlines?country=" . $code . "&language=en&apiKey=".$newsApi;
 } else {
-    $newsurl = "https://newsapi.org/v2/everything?q=" . $slug . "&sortBy=publishedAt&language=en&apiKey=f6a41d3092a94667a34fb5b92aada8bf";
+    $newsurl = "https://newsapi.org/v2/everything?q=" . $slug . "&sortBy=publishedAt&language=en&apiKey=".$newsApi;
 }
 
     $ch = curl_init();
@@ -166,7 +168,7 @@ if (in_array($code, $newscodes)){
     // set url and options
     curl_setopt($ch2, CURLOPT_SSL_VERIFYPEER, false);
 	curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch2, CURLOPT_URL,'http://api.geonames.org/countryInfoJSON?formatted=true&country=' . $code . '&username=nrproudfoot&style=full');  
+    curl_setopt($ch2, CURLOPT_URL,'http://api.geonames.org/countryInfoJSON?formatted=true&country=' . $code . '&username=$username&style=full');  
     curl_setopt($ch3, CURLOPT_SSL_VERIFYPEER, false);
 	curl_setopt($ch3, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch3, CURLOPT_URL,'https://api.openweathermap.org/data/2.5/weather?q=' . $restcountry['capital'] . ',' . $code . '&units=metric&appid=' . $openWeatherId);
@@ -184,13 +186,13 @@ if (in_array($code, $newscodes)){
     curl_setopt($ch7, CURLOPT_URL,'https://api.foursquare.com/v2/venues/explore?near=' . $slug . '&locale=en&categoryId=4bf58dd8d48988d116941735&limit=15&client_id=' . $foursquareId . '&client_secret=' . $foursquareSecret . '&v=20210101');
     curl_setopt($ch8, CURLOPT_SSL_VERIFYPEER, false);
 	curl_setopt($ch8, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch8, CURLOPT_URL,"http://api.geonames.org/earthquakesJSON?north=" . round($north,1) . "&south=" . round($south,1) . "&east=" . round($east,1) . "&west=" . round($west,1) . "&maxRows=15&username=nrproudfoot");
+    curl_setopt($ch8, CURLOPT_URL,"http://api.geonames.org/earthquakesJSON?north=" . round($north,1) . "&south=" . round($south,1) . "&east=" . round($east,1) . "&west=" . round($west,1) . "&maxRows=15&username=".$username);
     curl_setopt($ch9, CURLOPT_SSL_VERIFYPEER, false);
 	curl_setopt($ch9, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch9, CURLOPT_URL,"https://api.covid19api.com/total/country/" . $code);
     curl_setopt($ch10, CURLOPT_SSL_VERIFYPEER, false);
 	curl_setopt($ch10, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch10, CURLOPT_URL,"http://api.geonames.org/wikipediaSearch?q=" . $wikiCapital . "&maxRows=1&type=json&username=nrproudfoot");
+    curl_setopt($ch10, CURLOPT_URL,"http://api.geonames.org/wikipediaSearch?q=" . $wikiCapital . "&maxRows=1&type=json&username=".$username);
     curl_setopt($ch11, CURLOPT_SSL_VERIFYPEER, false);
 	curl_setopt($ch11, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch11, CURLOPT_URL,"https://api.meteostat.net/v2/point/climate?lat=" . $lat . "&lon=" .$lon . "&key=6FjvwVri89X19n5k3nbOXZTUUSrt7Iiy");
